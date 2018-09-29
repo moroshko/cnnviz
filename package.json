@@ -1,0 +1,23 @@
+{
+  "name": "cnnviz",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "NODE_ENV=test jest",
+    "test-watch": "NODE_ENV=test jest --watch",
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^7.0.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "prettier": "1.14.3"
+  },
+  "author": "Misha Moroshko <michael.moroshko@gmail.com>",
+  "license": "MIT"
+}
