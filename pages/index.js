@@ -53,6 +53,7 @@ export default class extends React.Component {
     switch (selectedInputType) {
       case INPUT_TYPES.IMAGE: {
         cancelAnimationFrame(this.requestID);
+        this.cameraStream.getTracks().forEach(track => track.stop());
 
         this.initImageInput();
         break;
@@ -144,6 +145,7 @@ export default class extends React.Component {
         audio: false
       })
       .then(stream => {
+        this.cameraStream = stream;
         this.cameraVideo.srcObject = stream;
         this.cameraVideo.play();
       })
