@@ -156,8 +156,6 @@ export function convolve({
   }
 
   return {
-    imageWidth: imageWidth - filterSize + 1,
-    imageHeight: imageHeight - filterSize + 1,
     imageData: data
   };
 }

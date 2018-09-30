@@ -73,7 +73,13 @@ export default class extends React.Component {
   }
 
   drawOutput(inputElement) {
-    const { inputWidth, inputHeight, activeFilter } = this.state;
+    const {
+      inputWidth,
+      inputHeight,
+      outputWidth,
+      outputHeight,
+      activeFilter
+    } = this.state;
 
     this.inputContext.drawImage(inputElement, 0, 0, inputWidth, inputHeight);
 
@@ -83,35 +89,22 @@ export default class extends React.Component {
       inputWidth,
       inputHeight
     );
-    const {
-      imageWidth: outputWidth,
-      imageHeight: outputHeight,
-      imageData: outputImageData
-    } = convolve({
+    const { imageData: outputImageData } = convolve({
       imageWidth: inputWidth,
       imageHeight: inputHeight,
-      // prettier-ignore
       imageData: inputImageData,
       filterSize: Math.sqrt(activeFilter.length),
       filter: activeFilter
     });
 
-    this.setState(
-      {
+    this.outputContext.putImageData(
+      new ImageData(
+        new Uint8ClampedArray(outputImageData),
         outputWidth,
         outputHeight
-      },
-      () => {
-        this.outputContext.putImageData(
-          new ImageData(
-            new Uint8ClampedArray(outputImageData),
-            outputWidth,
-            outputHeight
-          ),
-          0,
-          0
-        );
-      }
+      ),
+      0,
+      0
     );
   }
 
@@ -125,9 +118,15 @@ export default class extends React.Component {
       );
 
       this.setState(
-        {
-          inputWidth,
-          inputHeight
+        state => {
+          const filterSize = Math.sqrt(state.activeFilter.length);
+
+          return {
+            inputWidth,
+            inputHeight,
+            outputWidth: inputWidth - filterSize + 1,
+            outputHeight: inputHeight - filterSize + 1
+          };
         },
         () => {
           this.drawOutput(image);
@@ -152,9 +151,15 @@ export default class extends React.Component {
       .catch(console.error);
 
     this.setState(
-      {
-        inputWidth: VIDEO_WIDTH,
-        inputHeight: VIDEO_HEIGHT
+      state => {
+        const filterSize = Math.sqrt(state.activeFilter.length);
+
+        return {
+          inputWidth: VIDEO_WIDTH,
+          inputHeight: VIDEO_HEIGHT,
+          outputWidth: VIDEO_WIDTH - filterSize + 1,
+          outputHeight: VIDEO_HEIGHT - filterSize + 1
+        };
       },
       () => {
         const { inputWidth } = this.state;

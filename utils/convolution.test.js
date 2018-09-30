@@ -75,8 +75,6 @@ describe("convolve", () => {
         ]
       })
     ).toEqual({
-      imageWidth: 2,
-      imageHeight: 3,
       // prettier-ignore
       imageData: [
           0, 255,  57, 255,       255, 117, 255, 255,
