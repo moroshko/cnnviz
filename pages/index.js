@@ -83,23 +83,23 @@ export default class extends React.Component {
 
     this.inputContext.drawImage(inputElement, 0, 0, inputWidth, inputHeight);
 
-    const { data: inputImageData } = this.inputContext.getImageData(
+    const { data: inputData } = this.inputContext.getImageData(
       0,
       0,
       inputWidth,
       inputHeight
     );
-    const { imageData: outputImageData } = convolve({
-      imageWidth: inputWidth,
-      imageHeight: inputHeight,
-      imageData: inputImageData,
+    const { outputData } = convolve({
+      inputWidth,
+      inputHeight,
+      inputData,
       filterSize: Math.sqrt(activeFilter.length),
       filter: activeFilter
     });
 
     this.outputContext.putImageData(
       new ImageData(
-        new Uint8ClampedArray(outputImageData),
+        new Uint8ClampedArray(outputData),
         outputWidth,
         outputHeight
       ),

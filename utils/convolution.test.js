@@ -1,13 +1,13 @@
-import { CHANNEL, convolveChannel, convolve } from "./convolution";
+const { CHANNEL, convolveChannel, convolve } = require("./convolution");
 
 describe("convolveChannel", () => {
   it("filterSize = 3", () => {
     expect(
       convolveChannel({
-        imageWidth: 4,
-        imageHeight: 5,
+        inputWidth: 4,
+        inputHeight: 5,
         // prettier-ignore
-        imageData: [
+        inputData: [
            33, 205, 223,  24,     41, 238, 232, 249,     93,  54, 238,  66,     110,  78,  15, 117,
           156, 145, 209,  30,    175,  91, 158, 116,     17, 211, 222, 239,     223, 116, 158, 235,
            91,  49,  27, 211,    165,  61,  90, 133,     23, 121,  58, 100,     237, 104,  72,  36,
@@ -56,10 +56,10 @@ describe("convolve", () => {
   it("filterSize = 3", () => {
     expect(
       convolve({
-        imageWidth: 4,
-        imageHeight: 5,
+        inputWidth: 4,
+        inputHeight: 5,
         // prettier-ignore
-        imageData: [
+        inputData: [
            33, 205, 223,  24,     41, 238, 232, 249,     93,  54, 238,  66,     110,  78,  15, 117,
           156, 145, 209,  30,    175,  91, 158, 116,     17, 211, 222, 239,     223, 116, 158, 235,
            91,  49,  27, 211,    165,  61,  90, 133,     23, 121,  58, 100,     237, 104,  72,  36,
@@ -76,7 +76,7 @@ describe("convolve", () => {
       })
     ).toEqual({
       // prettier-ignore
-      imageData: [
+      outputData: [
           0, 255,  57, 255,       255, 117, 255, 255,
         209,   0,   6, 255,       159, 103,  17, 255,
         245,  30, 205, 255,       161,  77,   0, 255

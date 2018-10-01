@@ -1,16 +1,16 @@
-export const CHANNEL = {
+const CHANNEL = {
   R: 0,
   G: 1,
   B: 2
 };
 
-function getImageDataIndex({ imageWidth, channel, row, column }) {
-  return row * (imageWidth << 2) + (column << 2) + channel;
+function getImageDataIndex({ inputWidth, channel, row, column }) {
+  return row * (inputWidth << 2) + (column << 2) + channel;
 }
 
 function getImageDataIterator({
-  imageWidth,
-  imageData,
+  inputWidth,
+  inputData,
   channel,
   left,
   top,
@@ -18,7 +18,7 @@ function getImageDataIterator({
   height
 }) {
   let endIndex = getImageDataIndex({
-    imageWidth,
+    inputWidth,
     channel,
     row: top + height - 1,
     column: left + width - 1
@@ -30,7 +30,7 @@ function getImageDataIterator({
   return {
     next: () => {
       index = getImageDataIndex({
-        imageWidth,
+        inputWidth,
         channel,
         row,
         column
@@ -42,7 +42,7 @@ function getImageDataIterator({
               done: true
             }
           : {
-              value: imageData[index],
+              value: inputData[index],
               done: index === endIndex
             };
 
@@ -58,10 +58,10 @@ function getImageDataIterator({
   };
 }
 
-export function convolveChannel({
-  imageWidth,
-  imageHeight,
-  imageData,
+function convolveChannel({
+  inputWidth,
+  inputHeight,
+  inputData,
   channel,
   filterSize,
   filter
@@ -74,8 +74,8 @@ export function convolveChannel({
 
   do {
     const iterator = getImageDataIterator({
-      imageWidth,
-      imageData,
+      inputWidth,
+      inputData,
       channel,
       left,
       top,
@@ -105,13 +105,13 @@ export function convolveChannel({
       maxValue = resultValue;
     }
 
-    if (left === imageWidth - filterSize) {
+    if (left === inputWidth - filterSize) {
       left = 0;
       top += 1;
     } else {
       left += 1;
     }
-  } while (top <= imageHeight - filterSize);
+  } while (top <= inputHeight - filterSize);
 
   return {
     data,
@@ -120,18 +120,12 @@ export function convolveChannel({
   };
 }
 
-export function convolve({
-  imageWidth,
-  imageHeight,
-  imageData,
-  filterSize,
-  filter
-}) {
+function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
   const results = Object.values(CHANNEL).map(channel =>
     convolveChannel({
-      imageWidth,
-      imageHeight,
-      imageData,
+      inputWidth,
+      inputHeight,
+      inputData,
       channel,
       filterSize,
       filter
@@ -156,6 +150,12 @@ export function convolve({
   }
 
   return {
-    imageData: data
+    outputData: data
   };
 }
+
+module.exports = {
+  CHANNEL,
+  convolveChannel,
+  convolve
+};
