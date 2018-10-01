@@ -1,8 +1,9 @@
 const { performance } = require("perf_hooks");
 const { convolve } = require("../utils/convolution");
 
-const inputWidth = 400;
-const inputHeight = 300;
+const inputWidth = 512;
+const inputHeight = 384;
+const count = 300;
 
 function getRandomNumber(min, max) {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -33,8 +34,6 @@ function getRandomInputData(inputWidth, inputHeight) {
 const filterSizes = [1, 3, 5, 7];
 const filters = filterSizes.map(getRandomFilter);
 
-const count = 100;
-
 for (let i = 0; i < filterSizes.length; i++) {
   const filterSize = filterSizes[i];
   const filter = filters[i];
@@ -61,8 +60,12 @@ for (let i = 0; i < filterSizes.length; i++) {
 }
 
 /*
-  1x1 filter: 7ms
-  3x3 filter: 25ms
-  5x5 filter: 62ms
-  7x7 filter: 119ms
+  const inputWidth = 512;
+  const inputHeight = 384;
+  const count = 300;
+
+  1x1 filter: 12ms
+  3x3 filter: 32ms
+  5x5 filter: 72ms
+  7x7 filter: 135ms
 */
