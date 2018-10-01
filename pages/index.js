@@ -99,7 +99,7 @@ export default class extends React.Component {
 
     this.outputContext.putImageData(
       new ImageData(
-        new Uint8ClampedArray(outputData),
+        new Uint8ClampedArray(outputData), // expensive!
         outputWidth,
         outputHeight
       ),

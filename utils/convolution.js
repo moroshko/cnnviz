@@ -1,161 +1,157 @@
-const CHANNEL = {
-  R: 0,
-  G: 1,
-  B: 2
-};
-
-function getImageDataIndex({ inputWidth, channel, row, column }) {
-  return row * (inputWidth << 2) + (column << 2) + channel;
-}
-
-function getImageDataIterator({
+function convolutionStep({
   inputWidth,
   inputData,
-  channel,
-  left,
-  top,
-  width,
-  height
-}) {
-  let endIndex = getImageDataIndex({
-    inputWidth,
-    channel,
-    row: top + height - 1,
-    column: left + width - 1
-  });
-  let index;
-  let row = top;
-  let column = left;
-
-  return {
-    next: () => {
-      index = getImageDataIndex({
-        inputWidth,
-        channel,
-        row,
-        column
-      });
-
-      const result =
-        index > endIndex
-          ? {
-              done: true
-            }
-          : {
-              value: inputData[index],
-              done: index === endIndex
-            };
-
-      if (column === left + width - 1) {
-        column = left;
-        row += 1;
-      } else {
-        column += 1;
-      }
-
-      return result;
-    }
-  };
-}
-
-function convolveChannel({
-  inputWidth,
-  inputHeight,
-  inputData,
-  channel,
   filterSize,
-  filter
+  filter,
+  topLeftIndex,
+  outputWidthTimes4,
+  channel,
+  min,
+  max
 }) {
-  const data = [];
-  let minValue = Number.MAX_SAFE_INTEGER;
-  let maxValue = Number.MIN_SAFE_INTEGER;
-  let left = 0;
-  let top = 0;
+  const lastInputDataIndex =
+    topLeftIndex + (((inputWidth + 1) * (filterSize - 1)) << 2);
+  let inputDataIndex = topLeftIndex;
+  let filterIndex = 0;
+  let sum = 0;
 
-  do {
-    const iterator = getImageDataIterator({
-      inputWidth,
-      inputData,
-      channel,
-      left,
-      top,
-      width: filterSize,
-      height: filterSize
-    });
+  while (inputDataIndex <= lastInputDataIndex) {
+    sum += inputData[inputDataIndex + channel] * filter[filterIndex++];
 
-    let resultValue = 0;
-    let filterIndex = 0;
-    let item;
-
-    do {
-      item = iterator.next();
-
-      if (item.value !== undefined) {
-        resultValue += filter[filterIndex++] * item.value;
-      }
-    } while (!item.done);
-
-    data.push(resultValue);
-
-    if (resultValue < minValue) {
-      minValue = resultValue;
-    }
-
-    if (resultValue > maxValue) {
-      maxValue = resultValue;
-    }
-
-    if (left === inputWidth - filterSize) {
-      left = 0;
-      top += 1;
+    if (
+      ((inputDataIndex - topLeftIndex) >> 2) %
+      inputWidth ===
+      filterSize - 1
+    ) {
+      inputDataIndex += outputWidthTimes4;
     } else {
-      left += 1;
+      inputDataIndex += 4;
     }
-  } while (top <= inputHeight - filterSize);
+  }
 
   return {
-    data,
-    minValue,
-    maxValue
+    sum,
+    min: sum < min ? sum : min,
+    max: sum > max ? sum : max
   };
 }
 
 function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
-  const results = Object.values(CHANNEL).map(channel =>
-    convolveChannel({
+  const outputWidth = inputWidth - filterSize + 1;
+  const outputHeight = inputHeight - filterSize + 1;
+  const outputSize = (outputWidth * outputHeight) << 2;
+  const outputArray = new Array(outputSize);
+  const lastTopLeftIndex = (inputWidth * outputHeight - filterSize) << 2;
+  const filterSizeTimes4 = filterSize << 2;
+  const outputWidthTimes4 = outputWidth << 2;
+  let topLeftIndex = 0;
+  let outputArrayIndex = 0;
+  let minValues = [
+    Number.MAX_SAFE_INTEGER, // red
+    Number.MAX_SAFE_INTEGER, // green
+    Number.MAX_SAFE_INTEGER // blue
+  ];
+  let maxValues = [
+    Number.MIN_SAFE_INTEGER, // red
+    Number.MIN_SAFE_INTEGER, // green
+    Number.MIN_SAFE_INTEGER // blue
+  ];
+
+  while (topLeftIndex <= lastTopLeftIndex) {
+    // Red
+    let { sum, min, max } = convolutionStep({
       inputWidth,
-      inputHeight,
       inputData,
-      channel,
       filterSize,
-      filter
-    })
-  );
-  const multipliers = results.map(
-    ({ minValue, maxValue }) => 255 / (maxValue - minValue)
-  );
-  const data = [];
+      filter,
+      topLeftIndex,
+      outputWidthTimes4,
+      channel: 0,
+      min: minValues[0],
+      max: maxValues[0]
+    });
+    outputArray[outputArrayIndex++] = sum;
+    minValues[0] = min;
+    maxValues[0] = max;
 
-  for (let i = 0, len = results[0].data.length; i < len; i++) {
-    for (let channel = 0; channel < 3; channel++) {
-      data.push(
-        Math.round(
-          (results[channel].data[i] - results[channel].minValue) *
-            multipliers[channel]
-        )
-      );
+    // Green
+    ({ sum, min, max } = convolutionStep({
+      inputWidth,
+      inputData,
+      filterSize,
+      filter,
+      topLeftIndex,
+      outputWidthTimes4,
+      channel: 1,
+      min: minValues[1],
+      max: maxValues[1]
+    }));
+    outputArray[outputArrayIndex++] = sum;
+    minValues[1] = min;
+    maxValues[1] = max;
+
+    // Blue
+    ({ sum, min, max } = convolutionStep({
+      inputWidth,
+      inputData,
+      filterSize,
+      filter,
+      topLeftIndex,
+      outputWidthTimes4,
+      channel: 2,
+      min: minValues[2],
+      max: maxValues[2]
+    }));
+    outputArray[outputArrayIndex++] = sum;
+    minValues[2] = min;
+    maxValues[2] = max;
+
+    outputArrayIndex += 1; // skip alpha
+
+    if ((topLeftIndex >> 2) % inputWidth === inputWidth - filterSize) {
+      topLeftIndex += filterSizeTimes4;
+    } else {
+      topLeftIndex += 4;
     }
+  }
 
-    data.push(255); // alpha
+  // Normalize
+  const multipliers = [
+    255 / (maxValues[0] - minValues[0]),
+    255 / (maxValues[1] - minValues[1]),
+    255 / (maxValues[2] - minValues[2])
+  ];
+  const outputData = new Uint8ClampedArray(outputSize);
+
+  for (let channel = 0; channel < 3; channel++) {
+    for (
+      let outputIndex = channel, len = outputArray.length;
+      outputIndex < len;
+      outputIndex += 4
+    ) {
+      // (x + 0.5) | 0 is a quick version of Math.round(x)
+      outputData[outputIndex] =
+        ((outputArray[outputIndex] - minValues[channel]) *
+          multipliers[channel] +
+          0.5) |
+        0;
+    }
+  }
+
+  // set alpha channel
+  for (
+    let outputIndex = 3, len = outputArray.length;
+    outputIndex < len;
+    outputIndex += 4
+  ) {
+    outputData[outputIndex] = 255;
   }
 
   return {
-    outputData: data
+    outputData
   };
 }
 
 module.exports = {
-  CHANNEL,
-  convolveChannel,
   convolve
 };

@@ -1,9 +1,9 @@
-const { CHANNEL, convolveChannel, convolve } = require("./convolution");
+const { convolve } = require("./convolution");
 
-describe("convolveChannel", () => {
+describe.only("convolve", () => {
   it("filterSize = 3", () => {
     expect(
-      convolveChannel({
+      convolve({
         inputWidth: 4,
         inputHeight: 5,
         // prettier-ignore
@@ -14,7 +14,6 @@ describe("convolveChannel", () => {
           108,   7, 192,  43,    158,  26, 128, 201,    151,  90, 217,   3,     221, 168,  55, 155,
           135,  64, 226, 128,    222,  23, 165, 208,     44, 177, 216, 183,      70, 183, 124, 198,
         ],
-        channel: CHANNEL.R,
         /*
           Red channel:                 Green channel:               Blue channel:
 
@@ -41,46 +40,11 @@ describe("convolveChannel", () => {
         3211   2352         934   1574         3911   2033
       */
       // prettier-ignore
-      data: [
-         722, 3311,
-        2849, 2332,
-        3211, 2352,
-      ],
-      minValue: 722,
-      maxValue: 3311
-    });
-  });
-});
-
-describe("convolve", () => {
-  it("filterSize = 3", () => {
-    expect(
-      convolve({
-        inputWidth: 4,
-        inputHeight: 5,
-        // prettier-ignore
-        inputData: [
-           33, 205, 223,  24,     41, 238, 232, 249,     93,  54, 238,  66,     110,  78,  15, 117,
-          156, 145, 209,  30,    175,  91, 158, 116,     17, 211, 222, 239,     223, 116, 158, 235,
-           91,  49,  27, 211,    165,  61,  90, 133,     23, 121,  58, 100,     237, 104,  72,  36,
-          108,   7, 192,  43,    158,  26, 128, 201,    151,  90, 217,   3,     221, 168,  55, 155,
-          135,  64, 226, 128,    222,  23, 165, 208,     44, 177, 216, 183,      70, 183, 124, 198,
-        ],
-        filterSize: 3,
-        // prettier-ignore
-        filter: [
-          4,  6, -8,
-          3,  0,  6,
-          7, -1,  2
-        ]
-      })
-    ).toEqual({
-      // prettier-ignore
-      outputData: [
+      outputData: new Uint8ClampedArray([
           0, 255,  57, 255,       255, 117, 255, 255,
         209,   0,   6, 255,       159, 103,  17, 255,
         245,  30, 205, 255,       161,  77,   0, 255
-      ]
+      ])
     });
   });
 });

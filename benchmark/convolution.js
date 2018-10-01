@@ -61,8 +61,8 @@ for (let i = 0; i < filterSizes.length; i++) {
 }
 
 /*
-  1x1 filter: 56ms
-  3x3 filter: 104ms
-  5x5 filter: 216ms
-  7x7 filter: 401ms
+  1x1 filter: 7ms
+  3x3 filter: 25ms
+  5x5 filter: 62ms
+  7x7 filter: 119ms
 */
