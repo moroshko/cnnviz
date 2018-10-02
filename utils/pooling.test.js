@@ -1,18 +1,18 @@
-const { getConvolutionOutputDimensions, convolve } = require("./convolution");
+const { getPoolingOutputDimensions, pool } = require("./pooling");
 
-describe("getConvolutionOutputDimensions", () => {
+describe("getPoolingOutputDimensions", () => {
   it("returns the correct output width and height", () => {
-    expect(getConvolutionOutputDimensions(11, 8, 3)).toEqual({
-      outputWidth: 9,
-      outputHeight: 6
+    expect(getPoolingOutputDimensions(13, 8, 3, 2)).toEqual({
+      outputWidth: 6,
+      outputHeight: 3
     });
   });
 });
 
-describe("convolve", () => {
-  it("filterSize = 3", () => {
+describe("pool", () => {
+  it("filterSize = 2, stride = 2", () => {
     expect(
-      convolve({
+      pool({
         inputWidth: 4,
         inputHeight: 5,
         // prettier-ignore
@@ -32,29 +32,22 @@ describe("convolve", () => {
           108   158   151   221          7    26    90   168        192   128   217    55
           135   222    44    70         64    23   177   183        226   165   216   124
         */
-        filterSize: 3,
-        // prettier-ignore
-        filter: [
-          4,  6, -8,
-          3,  0,  6,
-          7, -1,  2
-        ],
+        filterSize: 2,
+        stride: 2,
         outputWidth: 2,
-        outputHeight: 3
+        outputHeight: 2
       })
     ).toEqual({
       /*
         Red channel:       Green channel:      Blue channel:
 
-         722   3311        4041   2135         2554   4374
-        2849   2332         514   1937         2087   2191
-        3211   2352         934   1574         3911   2033
+         175   223         238   211           232   238
+         165   237          61   168           192   217
       */
       // prettier-ignore
       outputData: new Uint8ClampedArray([
-          0, 255,  57, 255,       255, 117, 255, 255,
-        209,   0,   6, 255,       159, 103,  17, 255,
-        245,  30, 205, 255,       161,  77,   0, 255
+        175, 238, 232, 255,       223, 211, 238, 255,
+        165,  61, 192, 255,       237, 168, 217, 255,
       ])
     });
   });

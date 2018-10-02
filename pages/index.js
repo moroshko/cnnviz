@@ -1,8 +1,14 @@
-import { convolve } from "../utils/convolution";
-
-const MAX_IMAGE_WIDTH = 512;
-const VIDEO_WIDTH = 512;
-const VIDEO_HEIGHT = 384;
+import Controls from "./Controls";
+import { getConvolutionOutputDimensions, convolve } from "../utils/convolution";
+import { getPoolingOutputDimensions, pool } from "../utils/pooling";
+import {
+  INPUT_WIDTH,
+  INPUT_HEIGHT,
+  INPUT_TYPES,
+  INPUT_TYPES_LABELS,
+  LAYER_TYPES,
+  LAYER_TYPES_LABELS
+} from "../utils/constants";
 
 // prettier-ignore
 const FILTERS = [
@@ -23,29 +29,39 @@ const FILTERS = [
   ]
 ];
 
-const INPUT_TYPES = {
-  IMAGE: "IMAGE",
-  CAMERA: "CAMERA"
-};
-
-const INPUT_TYPES_LABELS = {
-  IMAGE: "Image",
-  CAMERA: "Camera"
-};
-
 export default class extends React.Component {
-  state = {
-    inputWidth: 0,
-    inputHeight: 0,
-    outputWidth: 0,
-    outputHeight: 0,
-    activeFilter: FILTERS[0],
-    activeFilterSize: Math.sqrt(FILTERS[0].length),
-    selectedInputType: INPUT_TYPES.CAMERA
-  };
+  constructor() {
+    super();
+
+    this.state = {
+      inputWidth: INPUT_WIDTH,
+      inputHeight: INPUT_HEIGHT,
+      selectedInputType: INPUT_TYPES.IMAGE,
+      selectedLayerType: LAYER_TYPES.POOL,
+      activeFilter: FILTERS[0]
+    };
+
+    this.state.activeFilterSize =
+      this.state.selectedLayerType === LAYER_TYPES.CONV
+        ? Math.sqrt(FILTERS[0].length)
+        : 2;
+
+    this.state = {
+      ...this.state,
+      ...this.getOutputDimensions(this.state)
+    };
+  }
 
   componentDidMount() {
     this.initInput();
+  }
+
+  stopCamera() {
+    cancelAnimationFrame(this.requestID);
+
+    if (this.cameraStream != null) {
+      this.cameraStream.getTracks().forEach(track => track.stop());
+    }
   }
 
   initInput() {
@@ -53,9 +69,7 @@ export default class extends React.Component {
 
     switch (selectedInputType) {
       case INPUT_TYPES.IMAGE: {
-        cancelAnimationFrame(this.requestID);
-        this.cameraStream.getTracks().forEach(track => track.stop());
-
+        this.stopCamera();
         this.initImageInput();
         break;
       }
@@ -70,6 +84,37 @@ export default class extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.selectedInputType !== prevState.selectedInputType) {
       this.initInput();
+    } else if (this.state.selectedLayerType !== prevState.selectedLayerType) {
+      this.setState({
+        ...this.getOutputDimensions(this.state)
+      });
+    }
+  }
+
+  getOutputDimensions(state) {
+    const { selectedLayerType, activeFilterSize } = state;
+
+    switch (selectedLayerType) {
+      case LAYER_TYPES.CONV: {
+        return getConvolutionOutputDimensions(
+          INPUT_WIDTH,
+          INPUT_HEIGHT,
+          activeFilterSize
+        );
+      }
+
+      case LAYER_TYPES.POOL: {
+        return getPoolingOutputDimensions(
+          INPUT_WIDTH,
+          INPUT_HEIGHT,
+          activeFilterSize,
+          2 // stride
+        );
+      }
+
+      default: {
+        throw Error(`Unknown layer type: ${selectedLayerType}`);
+      }
     }
   }
 
@@ -79,6 +124,7 @@ export default class extends React.Component {
       inputHeight,
       outputWidth,
       outputHeight,
+      selectedLayerType,
       activeFilter,
       activeFilterSize
     } = this.state;
@@ -91,13 +137,39 @@ export default class extends React.Component {
       inputWidth,
       inputHeight
     );
-    const { outputData } = convolve({
-      inputWidth,
-      inputHeight,
-      inputData,
-      filter: activeFilter,
-      filterSize: activeFilterSize
-    });
+    let outputData;
+
+    switch (selectedLayerType) {
+      case LAYER_TYPES.CONV: {
+        ({ outputData } = convolve({
+          inputWidth,
+          inputHeight,
+          inputData,
+          filter: activeFilter,
+          filterSize: activeFilterSize,
+          outputWidth,
+          outputHeight
+        }));
+        break;
+      }
+
+      case LAYER_TYPES.POOL: {
+        ({ outputData } = pool({
+          inputWidth,
+          inputHeight,
+          inputData,
+          filterSize: 2,
+          stride: 2,
+          outputWidth,
+          outputHeight
+        }));
+        break;
+      }
+
+      default: {
+        throw Error(`Unknown layer type: ${selectedLayerType}`);
+      }
+    }
 
     this.outputContext.putImageData(
       new ImageData(
@@ -114,17 +186,11 @@ export default class extends React.Component {
     const image = new Image();
 
     image.onload = () => {
-      const inputWidth = Math.min(MAX_IMAGE_WIDTH, image.naturalWidth);
-      const inputHeight = Math.floor(
-        (inputWidth * image.naturalHeight) / image.naturalWidth
-      );
-
       this.setState(
-        ({ activeFilterSize }) => ({
-          inputWidth,
-          inputHeight,
-          outputWidth: inputWidth - activeFilterSize + 1,
-          outputHeight: inputHeight - activeFilterSize + 1
+        state => ({
+          inputWidth: INPUT_WIDTH,
+          inputHeight: INPUT_HEIGHT,
+          ...this.getOutputDimensions(state)
         }),
         () => {
           this.drawOutput(image);
@@ -132,13 +198,13 @@ export default class extends React.Component {
       );
     };
 
-    image.src = "/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpeg";
+    image.src = "/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg";
   }
 
   initCameraInput() {
     navigator.mediaDevices
       .getUserMedia({
-        video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT },
+        video: { width: INPUT_WIDTH, height: INPUT_HEIGHT },
         audio: false
       })
       .then(stream => {
@@ -149,15 +215,15 @@ export default class extends React.Component {
       .catch(console.error);
 
     this.setState(
-      ({ activeFilterSize }) => ({
-        inputWidth: VIDEO_WIDTH,
-        inputHeight: VIDEO_HEIGHT,
-        outputWidth: VIDEO_WIDTH - activeFilterSize + 1,
-        outputHeight: VIDEO_HEIGHT - activeFilterSize + 1
+      state => ({
+        inputWidth: INPUT_WIDTH,
+        inputHeight: INPUT_HEIGHT,
+        ...this.getOutputDimensions(state)
       }),
       () => {
         const { inputWidth } = this.state;
 
+        // Flip canvas horizontally
         this.inputContext.translate(inputWidth, 0);
         this.inputContext.scale(-1, 1);
 
@@ -180,6 +246,12 @@ export default class extends React.Component {
     }
   };
 
+  videoRef = video => {
+    if (video != null) {
+      this.cameraVideo = video;
+    }
+  };
+
   outputCanvasRef = canvas => {
     if (canvas !== null) {
       this.outputContext = canvas.getContext("2d", {
@@ -188,10 +260,35 @@ export default class extends React.Component {
     }
   };
 
-  onInputTypeChange = event => {
+  onInputTypeChange = selectedInputType => {
     this.setState({
-      selectedInputType: event.target.value
+      selectedInputType
     });
+  };
+
+  onLayerTypeChange = selectedLayerType => {
+    switch (selectedLayerType) {
+      case LAYER_TYPES.CONV: {
+        this.setState({
+          selectedLayerType,
+          activeFilter: FILTERS[0],
+          activeFilterSize: Math.sqrt(FILTERS[0].length)
+        });
+        break;
+      }
+
+      case LAYER_TYPES.POOL: {
+        this.setState({
+          selectedLayerType,
+          activeFilterSize: 2
+        });
+        break;
+      }
+
+      default: {
+        throw Error(`Unknown layer type: ${selectedLayerType}`);
+      }
+    }
   };
 
   render() {
@@ -200,7 +297,8 @@ export default class extends React.Component {
       inputHeight,
       outputWidth,
       outputHeight,
-      selectedInputType
+      selectedInputType,
+      selectedLayerType
     } = this.state;
 
     return (
@@ -219,11 +317,9 @@ export default class extends React.Component {
           {selectedInputType === INPUT_TYPES.CAMERA && (
             <video
               style={{ transform: "rotateY(180deg)" }}
-              width={VIDEO_WIDTH}
-              height={VIDEO_HEIGHT}
-              ref={video => {
-                this.cameraVideo = video;
-              }}
+              width={INPUT_WIDTH}
+              height={INPUT_HEIGHT}
+              ref={this.videoRef}
             />
           )}
           <canvas
@@ -233,21 +329,12 @@ export default class extends React.Component {
             ref={this.outputCanvasRef}
           />
         </div>
-        <div>
-          Input:
-          {Object.keys(INPUT_TYPES).map(inputType => (
-            <label key={inputType}>
-              <input
-                type="radio"
-                name="input"
-                value={inputType}
-                checked={inputType === selectedInputType}
-                onChange={this.onInputTypeChange}
-              />
-              {INPUT_TYPES_LABELS[inputType]}
-            </label>
-          ))}
-        </div>
+        <Controls
+          selectedInputType={selectedInputType}
+          onInputTypeChange={this.onInputTypeChange}
+          selectedLayerType={selectedLayerType}
+          onLayerTypeChange={this.onLayerTypeChange}
+        />
       </div>
     );
   }

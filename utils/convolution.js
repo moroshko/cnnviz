@@ -1,3 +1,10 @@
+function getConvolutionOutputDimensions(inputWidth, inputHeight, filterSize) {
+  return {
+    outputWidth: inputWidth - filterSize + 1,
+    outputHeight: inputHeight - filterSize + 1
+  };
+}
+
 function convolutionStep({
   inputWidth,
   inputData,
@@ -36,9 +43,15 @@ function convolutionStep({
   };
 }
 
-function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
-  const outputWidth = inputWidth - filterSize + 1;
-  const outputHeight = inputHeight - filterSize + 1;
+function convolve({
+  inputWidth,
+  inputHeight,
+  inputData,
+  filterSize,
+  filter,
+  outputWidth,
+  outputHeight
+}) {
   const outputSize = (outputWidth * outputHeight) << 2;
   const outputArray = new Array(outputSize);
   const lastTopLeftIndex = (inputWidth * outputHeight - filterSize) << 2;
@@ -47,14 +60,14 @@ function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
   let topLeftIndex = 0;
   let outputArrayIndex = 0;
   let minValues = [
-    Number.MAX_SAFE_INTEGER, // red
-    Number.MAX_SAFE_INTEGER, // green
-    Number.MAX_SAFE_INTEGER // blue
+    Infinity, // red
+    Infinity, // green
+    Infinity // blue
   ];
   let maxValues = [
-    Number.MIN_SAFE_INTEGER, // red
-    Number.MIN_SAFE_INTEGER, // green
-    Number.MIN_SAFE_INTEGER // blue
+    -Infinity, // red
+    -Infinity, // green
+    -Infinity // blue
   ];
 
   while (topLeftIndex <= lastTopLeftIndex) {
@@ -129,7 +142,7 @@ function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
       outputIndex < len;
       outputIndex += 4
     ) {
-      // (x + 0.5) | 0 is a quick version of Math.round(x)
+      // (x + 0.5) | 0 is a faster version of Math.round(x)
       outputData[outputIndex] =
         ((outputArray[outputIndex] - minValues[channel]) *
           multipliers[channel] +
@@ -153,5 +166,6 @@ function convolve({ inputWidth, inputHeight, inputData, filterSize, filter }) {
 }
 
 module.exports = {
+  getConvolutionOutputDimensions,
   convolve
 };
