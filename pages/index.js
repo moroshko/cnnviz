@@ -1,3 +1,4 @@
+import Output from "./Output";
 import Controls from "./Controls";
 import { getConvolutionOutputDimensions, convolve } from "../utils/convolution";
 import { getPoolingOutputDimensions, pool } from "../utils/pooling";
@@ -171,15 +172,7 @@ export default class extends React.Component {
       }
     }
 
-    this.outputContext.putImageData(
-      new ImageData(
-        new Uint8ClampedArray(outputData),
-        outputWidth,
-        outputHeight
-      ),
-      0,
-      0
-    );
+    this.output.update(outputData);
   }
 
   initImageInput() {
@@ -252,11 +245,9 @@ export default class extends React.Component {
     }
   };
 
-  outputCanvasRef = canvas => {
-    if (canvas !== null) {
-      this.outputContext = canvas.getContext("2d", {
-        alpha: false
-      });
+  outputRef = output => {
+    if (output != null) {
+      this.output = output;
     }
   };
 
@@ -322,12 +313,13 @@ export default class extends React.Component {
               ref={this.videoRef}
             />
           )}
-          <canvas
-            style={{ alignSelf: "flex-start", marginLeft: 20 }}
-            width={outputWidth}
-            height={outputHeight}
-            ref={this.outputCanvasRef}
-          />
+          <div style={{ alignSelf: "flex-start", marginLeft: 20 }}>
+            <Output
+              width={outputWidth}
+              height={outputHeight}
+              ref={this.outputRef}
+            />
+          </div>
         </div>
         <Controls
           selectedInputType={selectedInputType}
