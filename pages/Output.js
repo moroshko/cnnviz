@@ -1,4 +1,4 @@
-export default class extends React.Component {
+export default class Output extends React.Component {
   canvasRef = canvas => {
     if (canvas !== null) {
       this.canvasContext = canvas.getContext("2d", {

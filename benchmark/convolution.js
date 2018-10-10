@@ -1,11 +1,11 @@
 const { performance } = require("perf_hooks");
+const { INPUT_WIDTH, INPUT_HEIGHT } = require("../utils/constants");
 const {
   getConvolutionOutputDimensions,
   convolve
 } = require("../utils/convolution");
-const { INPUT_WIDTH, INPUT_HEIGHT } = require("../utils/constants");
 
-const count = 300;
+const COUNT = 300;
 
 function getRandomNumber(min, max) {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -41,7 +41,7 @@ for (let i = 0; i < filterSizes.length; i++) {
   const filter = filters[i];
   let totalTime = 0;
 
-  for (let k = 0; k < count; k++) {
+  for (let k = 0; k < COUNT; k++) {
     const inputData = getRandomInputData();
     const startTime = performance.now();
     const { outputData } = convolve({
@@ -50,23 +50,27 @@ for (let i = 0; i < filterSizes.length; i++) {
       inputData,
       filterSize,
       filter,
-      ...getConvolutionOutputDimensions(INPUT_WIDTH, INPUT_HEIGHT, filterSize)
+      ...getConvolutionOutputDimensions({
+        inputWidth: INPUT_WIDTH,
+        inputHeight: INPUT_HEIGHT,
+        filterSize
+      })
     });
     const endTime = performance.now();
 
     totalTime += endTime - startTime;
   }
 
-  const averageTime = Math.round(totalTime / count);
+  const averageTime = Math.round(totalTime / COUNT);
 
   console.log(`${filterSize}x${filterSize} filter: ${averageTime}ms`);
 }
 
 /*
-  const count = 300;
+  const COUNT = 300;
 
-  1x1 filter: 12ms
-  3x3 filter: 40ms
-  5x5 filter: 80ms
-  7x7 filter: 152ms
+  1x1 filter: 10ms
+  3x3 filter: 30ms
+  5x5 filter: 70ms
+  7x7 filter: 130ms
 */

@@ -5,7 +5,7 @@ import {
   LAYER_TYPES_LABELS
 } from "../utils/constants";
 
-export default class extends React.Component {
+export default class Controls extends React.Component {
   onInputTypeChange = event => {
     this.props.onInputTypeChange(event.target.value);
   };

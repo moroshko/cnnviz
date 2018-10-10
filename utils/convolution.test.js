@@ -2,7 +2,13 @@ const { getConvolutionOutputDimensions, convolve } = require("./convolution");
 
 describe("getConvolutionOutputDimensions", () => {
   it("returns the correct output width and height", () => {
-    expect(getConvolutionOutputDimensions(11, 8, 3)).toEqual({
+    expect(
+      getConvolutionOutputDimensions({
+        inputWidth: 11,
+        inputHeight: 8,
+        filterSize: 3
+      })
+    ).toEqual({
       outputWidth: 9,
       outputHeight: 6
     });

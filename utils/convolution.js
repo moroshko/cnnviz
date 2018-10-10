@@ -1,4 +1,8 @@
-function getConvolutionOutputDimensions(inputWidth, inputHeight, filterSize) {
+function getConvolutionOutputDimensions({
+  inputWidth,
+  inputHeight,
+  filterSize
+}) {
   return {
     outputWidth: inputWidth - filterSize + 1,
     outputHeight: inputHeight - filterSize + 1

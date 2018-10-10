@@ -2,7 +2,14 @@ const { getPoolingOutputDimensions, pool } = require("./pooling");
 
 describe("getPoolingOutputDimensions", () => {
   it("returns the correct output width and height", () => {
-    expect(getPoolingOutputDimensions(13, 8, 3, 2)).toEqual({
+    expect(
+      getPoolingOutputDimensions({
+        inputWidth: 13,
+        inputHeight: 8,
+        filterSize: 3,
+        stride: 2
+      })
+    ).toEqual({
       outputWidth: 6,
       outputHeight: 3
     });
