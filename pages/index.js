@@ -6,8 +6,8 @@ import { getOutputDimensions } from "../utils/shared";
 import { convolve } from "../utils/convolution";
 import { pool } from "../utils/pooling";
 import {
-  INPUT_WIDTH,
-  INPUT_HEIGHT,
+  INPUT_DISPLAY_WIDTH,
+  INPUT_DISPLAY_HEIGHT,
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
@@ -33,13 +33,25 @@ const FILTERS = [
   ]
 ];
 
+const IMAGES = [
+  {
+    src: "/static/digit_4.jpg",
+    scale: 16
+  },
+  {
+    src: "/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg",
+    scale: 1
+  }
+];
+
 export default class App extends React.Component {
   constructor() {
     super();
 
     this.state = {
       selectedInputType: INPUT_TYPES.IMAGE,
-      selectedLayerType: LAYER_TYPES.POOL,
+      selectedImage: IMAGES[0],
+      selectedLayerType: LAYER_TYPES.CONV,
       activeFilter: FILTERS[0],
       stride: 2
     };
@@ -49,57 +61,93 @@ export default class App extends React.Component {
         ? Math.sqrt(FILTERS[0].length)
         : 2;
 
-    const { outputWidth, outputHeight } = getOutputDimensions({
-      inputWidth: INPUT_WIDTH,
-      inputHeight: INPUT_HEIGHT,
+    this.state.scale =
+      this.state.selectedInputType === INPUT_TYPES.IMAGE
+        ? this.state.selectedImage.scale
+        : 1;
+
+    const {
+      outputWidth: outputDataWidth,
+      outputHeight: outputDataHeight
+    } = getOutputDimensions({
+      inputWidth: INPUT_DISPLAY_WIDTH / this.state.scale,
+      inputHeight: INPUT_DISPLAY_HEIGHT / this.state.scale,
       layerType: this.state.selectedLayerType,
       filterSize: this.state.activeFilterSize,
       stride: this.state.stride
     });
 
-    this.state.outputWidth = outputWidth;
-    this.state.outputHeight = outputHeight;
+    this.state.outputDataWidth = outputDataWidth;
+    this.state.outputDataHeight = outputDataHeight;
   }
 
   componentDidUpdate(prevProps, prevState) {
     const {
       selectedInputType,
+      selectedImage,
       selectedLayerType,
       activeFilterSize,
       stride,
-      outputWidth,
-      outputHeight
+      scale,
+      outputDataWidth,
+      outputDataHeight
     } = this.state;
 
     if (
-      outputWidth !== prevState.outputWidth ||
-      outputHeight !== prevState.outputHeight
+      outputDataWidth !== prevState.outputDataWidth ||
+      outputDataHeight !== prevState.outputDataHeight
     ) {
       this.drawOutput();
-    } else if (selectedLayerType !== prevState.selectedLayerType) {
-      const { outputWidth, outputHeight } = getOutputDimensions({
-        inputWidth: INPUT_WIDTH,
-        inputHeight: INPUT_HEIGHT,
+    } else if (
+      selectedInputType !== prevState.selectedInputType ||
+      selectedImage !== prevState.selectedImage
+    ) {
+      const newScale =
+        selectedInputType === INPUT_TYPES.IMAGE ? selectedImage.scale : 1;
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / newScale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
         layerType: selectedLayerType,
         filterSize: activeFilterSize,
         stride
       });
 
       this.setState({
-        outputWidth,
-        outputHeight
+        outputDataWidth,
+        outputDataHeight,
+        scale: newScale
+      });
+    } else if (selectedLayerType !== prevState.selectedLayerType) {
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+        layerType: selectedLayerType,
+        filterSize: activeFilterSize,
+        stride
+      });
+
+      this.setState({
+        outputDataWidth,
+        outputDataHeight
       });
     }
   }
 
   drawOutput = () => {
     const {
-      outputWidth,
-      outputHeight,
+      outputDataWidth,
+      outputDataHeight,
       selectedLayerType,
       activeFilter,
       activeFilterSize,
-      stride
+      stride,
+      scale
     } = this.state;
 
     const inputData = this.input.getInputData();
@@ -108,26 +156,26 @@ export default class App extends React.Component {
     switch (selectedLayerType) {
       case LAYER_TYPES.CONV: {
         ({ outputData } = convolve({
-          inputWidth: INPUT_WIDTH,
-          inputHeight: INPUT_HEIGHT,
+          inputWidth: INPUT_DISPLAY_WIDTH / scale,
+          inputHeight: INPUT_DISPLAY_HEIGHT / scale,
           inputData,
           filter: activeFilter,
           filterSize: activeFilterSize,
-          outputWidth,
-          outputHeight
+          outputWidth: outputDataWidth,
+          outputHeight: outputDataHeight
         }));
         break;
       }
 
       case LAYER_TYPES.POOL: {
         ({ outputData } = pool({
-          inputWidth: INPUT_WIDTH,
-          inputHeight: INPUT_HEIGHT,
+          inputWidth: INPUT_DISPLAY_WIDTH / scale,
+          inputHeight: INPUT_DISPLAY_HEIGHT / scale,
           inputData,
           filterSize: activeFilterSize,
           stride,
-          outputWidth,
-          outputHeight
+          outputWidth: outputDataWidth,
+          outputHeight: outputDataHeight
         }));
         break;
       }
@@ -186,10 +234,12 @@ export default class App extends React.Component {
 
   render() {
     const {
-      outputWidth,
-      outputHeight,
+      outputDataWidth,
+      outputDataHeight,
       selectedInputType,
-      selectedLayerType
+      selectedImage,
+      selectedLayerType,
+      scale
     } = this.state;
 
     return (
@@ -198,16 +248,19 @@ export default class App extends React.Component {
           <div style={{ alignSelf: "flex-start" }}>
             {selectedInputType === INPUT_TYPES.IMAGE && (
               <ImageInput
-                width={INPUT_WIDTH}
-                height={INPUT_HEIGHT}
-                onReady={this.drawOutput}
+                displayWidth={INPUT_DISPLAY_WIDTH}
+                displayHeight={INPUT_DISPLAY_HEIGHT}
+                scale={scale}
+                src={selectedImage.src}
+                onUpdate={this.drawOutput}
                 ref={this.inputRef}
               />
             )}
             {selectedInputType === INPUT_TYPES.CAMERA && (
               <CameraInput
-                width={INPUT_WIDTH}
-                height={INPUT_HEIGHT}
+                width={INPUT_DISPLAY_WIDTH}
+                height={INPUT_DISPLAY_HEIGHT}
+                scale={scale}
                 onUpdate={this.drawOutput}
                 ref={this.inputRef}
               />
@@ -215,8 +268,9 @@ export default class App extends React.Component {
           </div>
           <div style={{ alignSelf: "flex-start", marginLeft: 20 }}>
             <Output
-              width={outputWidth}
-              height={outputHeight}
+              dataWidth={outputDataWidth}
+              dataHeight={outputDataHeight}
+              scale={scale}
               ref={this.outputRef}
             />
           </div>

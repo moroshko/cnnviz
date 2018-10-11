@@ -17,19 +17,23 @@ export default class CameraInput extends React.Component {
       })
       .catch(console.error);
 
-    // Flip canvas horizontally
+    // Flip the canvas horizontally
     this.canvasContext.translate(width, 0);
     this.canvasContext.scale(-1, 1);
 
-    this.requestID = requestAnimationFrame(this.triggerUpdates);
+    this.canvasContext.drawImage(this.video, 0, 0, width, height);
+
+    this.requestID = requestAnimationFrame(this.update);
   }
 
-  triggerUpdates = () => {
-    const { onUpdate } = this.props;
+  update = () => {
+    const { width, height, onUpdate } = this.props;
+
+    this.canvasContext.drawImage(this.video, 0, 0, width, height);
 
     onUpdate();
 
-    this.requestID = requestAnimationFrame(this.triggerUpdates);
+    this.requestID = requestAnimationFrame(this.update);
   };
 
   componentWillUnmount() {
@@ -57,8 +61,6 @@ export default class CameraInput extends React.Component {
 
   getInputData() {
     const { width, height } = this.props;
-
-    this.canvasContext.drawImage(this.video, 0, 0, width, height);
 
     return this.canvasContext.getImageData(0, 0, width, height).data;
   }

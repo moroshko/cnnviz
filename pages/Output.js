@@ -1,25 +1,65 @@
 export default class Output extends React.Component {
-  canvasRef = canvas => {
+  dataCanvasRef = canvas => {
     if (canvas !== null) {
-      this.canvasContext = canvas.getContext("2d", {
+      this.dataCanvasContext = canvas.getContext("2d", {
+        alpha: false
+      });
+    }
+  };
+
+  displayCanvasRef = canvas => {
+    if (canvas !== null) {
+      this.displayCanvasContext = canvas.getContext("2d", {
         alpha: false
       });
     }
   };
 
   update(data) {
-    const { width, height } = this.props;
-
-    this.canvasContext.putImageData(
-      new ImageData(new Uint8ClampedArray(data), width, height),
-      0,
-      0
+    const { dataWidth, dataHeight, scale } = this.props;
+    const imageData = new ImageData(
+      new Uint8ClampedArray(data),
+      dataWidth,
+      dataHeight
     );
+
+    this.dataCanvasContext.putImageData(imageData, 0, 0);
+
+    createImageBitmap(imageData).then(imageBitmap => {
+      this.displayCanvasContext.imageSmoothingEnabled = false;
+      this.displayCanvasContext.drawImage(
+        imageBitmap,
+        0,
+        0,
+        dataWidth,
+        dataHeight,
+        0,
+        0,
+        dataWidth * scale,
+        dataHeight * scale
+      );
+    });
   }
 
   render() {
-    const { width, height } = this.props;
+    const { dataWidth, dataHeight, scale } = this.props;
 
-    return <canvas width={width} height={height} ref={this.canvasRef} />;
+    return (
+      <div>
+        <canvas
+          style={{
+            display: "none"
+          }}
+          width={dataWidth}
+          height={dataHeight}
+          ref={this.dataCanvasRef}
+        />
+        <canvas
+          width={dataWidth * scale}
+          height={dataHeight * scale}
+          ref={this.displayCanvasRef}
+        />
+      </div>
+    );
   }
 }
