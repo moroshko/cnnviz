@@ -11,36 +11,9 @@ import {
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
-  LAYER_TYPES_LABELS
+  LAYER_TYPES_LABELS,
+  CONV_FILTERS
 } from "../utils/constants";
-
-// prettier-ignore
-const CONV_FILTERS = [
-  {
-    name: 'Filter 1',
-    filter: [
-      1, 0, -1,
-      1, 0, -1,
-      1, 0, -1
-    ]
-  },
-  {
-    name: 'Filter 2',
-    filter: [
-      1, 0, -1,
-      2, 0, -2,
-      1, 0, -1
-    ]
-  },
-  {
-    name: 'Filter 3',
-    filter: [
-      3, 0, -3,
-      10, 0, -10,
-      3, 0, -3
-    ]
-  }
-];
 
 const POOL_FILTER_SIZES = [2, 4, 8];
 
@@ -63,15 +36,15 @@ export default class App extends React.Component {
       selectedInputType: INPUT_TYPES.IMAGE,
       selectedImage: IMAGES[0],
       selectedLayerType: LAYER_TYPES.CONV,
-      activeConvFilter: CONV_FILTERS[0],
+      selectedConvFilter: CONV_FILTERS[0],
       convStride: 2,
       activePoolFilterSize: POOL_FILTER_SIZES[0],
       poolStride: 2
     };
 
-    this.state.activeConvFilterSize =
+    this.state.selectedConvFilterSize =
       this.state.selectedLayerType === LAYER_TYPES.CONV
-        ? Math.sqrt(this.state.activeConvFilter.filter.length)
+        ? Math.sqrt(this.state.selectedConvFilter.filter.length)
         : 2;
 
     this.state.scale =
@@ -88,7 +61,7 @@ export default class App extends React.Component {
       layerType: this.state.selectedLayerType,
       filterSize:
         this.state.selectedLayerType === LAYER_TYPES.CONV
-          ? this.state.activeConvFilterSize
+          ? this.state.selectedConvFilterSize
           : this.state.activePoolFilterSize,
       stride:
         this.state.selectedLayerType === LAYER_TYPES.CONV
@@ -105,7 +78,8 @@ export default class App extends React.Component {
       selectedInputType,
       selectedImage,
       selectedLayerType,
-      activeConvFilterSize,
+      selectedConvFilter,
+      selectedConvFilterSize,
       convStride,
       activePoolFilterSize,
       poolStride,
@@ -116,7 +90,9 @@ export default class App extends React.Component {
 
     if (
       outputDataWidth !== prevState.outputDataWidth ||
-      outputDataHeight !== prevState.outputDataHeight
+      outputDataHeight !== prevState.outputDataHeight ||
+      selectedConvFilter !== prevState.selectedConvFilter ||
+      selectedConvFilterSize !== prevState.selectedConvFilterSize
     ) {
       this.drawOutput();
     } else if (
@@ -134,7 +110,7 @@ export default class App extends React.Component {
         layerType: selectedLayerType,
         filterSize:
           selectedLayerType === LAYER_TYPES.CONV
-            ? activeConvFilterSize
+            ? selectedConvFilterSize
             : activePoolFilterSize,
         stride: selectedLayerType === LAYER_TYPES.CONV ? convStride : poolStride
       });
@@ -154,7 +130,7 @@ export default class App extends React.Component {
         layerType: selectedLayerType,
         filterSize:
           selectedLayerType === LAYER_TYPES.CONV
-            ? activeConvFilterSize
+            ? selectedConvFilterSize
             : activePoolFilterSize,
         stride: selectedLayerType === LAYER_TYPES.CONV ? convStride : poolStride
       });
@@ -171,8 +147,8 @@ export default class App extends React.Component {
       outputDataWidth,
       outputDataHeight,
       selectedLayerType,
-      activeConvFilter,
-      activeConvFilterSize,
+      selectedConvFilter,
+      selectedConvFilterSize,
       activePoolFilterSize,
       poolStride,
       scale
@@ -187,8 +163,8 @@ export default class App extends React.Component {
           inputWidth: INPUT_DISPLAY_WIDTH / scale,
           inputHeight: INPUT_DISPLAY_HEIGHT / scale,
           inputData,
-          filter: activeConvFilter.filter,
-          filterSize: activeConvFilterSize,
+          filter: selectedConvFilter.filter,
+          filterSize: selectedConvFilterSize,
           outputWidth: outputDataWidth,
           outputHeight: outputDataHeight
         }));
@@ -240,6 +216,13 @@ export default class App extends React.Component {
     });
   };
 
+  onConvFilterChange = selectedConvFilter => {
+    this.setState({
+      selectedConvFilter,
+      selectedConvFilterSize: Math.sqrt(selectedConvFilter.filter.length)
+    });
+  };
+
   render() {
     const {
       outputDataWidth,
@@ -247,6 +230,7 @@ export default class App extends React.Component {
       selectedInputType,
       selectedImage,
       selectedLayerType,
+      selectedConvFilter,
       scale
     } = this.state;
 
@@ -288,6 +272,8 @@ export default class App extends React.Component {
           onInputTypeChange={this.onInputTypeChange}
           selectedLayerType={selectedLayerType}
           onLayerTypeChange={this.onLayerTypeChange}
+          selectedConvFilter={selectedConvFilter}
+          onConvFilterChange={this.onConvFilterChange}
         />
       </div>
     );
