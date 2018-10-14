@@ -23,6 +23,7 @@ const LAYER_TYPES_LABELS = {
 const CONV_FILTERS = [
   {
     name: 'Edge detection',
+    editable: false,
     filter: [
       0,  1, 0,
       1, -4, 1,
@@ -30,29 +31,34 @@ const CONV_FILTERS = [
     ]
   },
   {
-    name: 'Gaussian blur',
+    name: 'Blur',
+    editable: false,
     filter: [
-      1, 2, 1,
-      2, 4, 2,
-      1, 2, 1
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1,
     ]
   },
   {
-    name: 'Filter 3',
+    name: 'Sharpen',
+    editable: false,
     filter: [
-      1, 0, -1,
-      2, 0, -2,
-      1, 0, -1
+       0, -1,  0,
+      -1,  5, -1,
+       0, -1,  0
     ]
   },
   {
-    name: 'Filter 4',
+    name: 'Custom',
+    editable: true,
     filter: [
-      3, 0, -3,
-      10, 0, -10,
-      3, 0, -3
+       0, 0, 0,
+       0, 1, 0,
+       0, 0, 0
     ]
-  }
+  },
 ];
 
 module.exports = {
