@@ -1,20 +1,4 @@
-const { getPoolingOutputDimensions, pool } = require("./pooling");
-
-describe("getPoolingOutputDimensions", () => {
-  it("returns the correct output width and height", () => {
-    expect(
-      getPoolingOutputDimensions({
-        inputWidth: 13,
-        inputHeight: 8,
-        filterSize: 3,
-        stride: 2
-      })
-    ).toEqual({
-      outputWidth: 6,
-      outputHeight: 3
-    });
-  });
-});
+const { pool } = require("./pooling");
 
 describe("pool", () => {
   it("filterSize = 2, stride = 2", () => {

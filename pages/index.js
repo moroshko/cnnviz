@@ -47,7 +47,7 @@ const INITIAL_CONV_FILTERS = [
     ]
   },
   {
-    name: 'Custom',
+    name: 'Custom (editable)',
     isEditable: true,
     filter: [
        0, 0, 0,
@@ -89,21 +89,18 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      selectedInputType: INPUT_TYPES.IMAGE,
+      selectedInputType: INPUT_TYPES.CAMERA,
       selectedImage: IMAGES[1],
       selectedLayerType: LAYER_TYPES.CONV,
       convFilters: INITIAL_CONV_FILTERS,
-      selectedConvFilterIndex: 3,
-      convStride: 2,
+      selectedConvFilterIndex: 2,
+      convStride: 1,
       poolFilters: INITIAL_POOL_FILTERS,
       selectedPoolFilterIndex: 0,
       poolStride: 2
     };
 
-    this.state.scale =
-      this.state.selectedInputType === INPUT_TYPES.IMAGE
-        ? this.state.selectedImage.scale
-        : 1;
+    this.state.scale = this.getScale();
 
     const {
       outputWidth: outputDataWidth,
@@ -111,12 +108,17 @@ export default class App extends React.Component {
     } = getOutputDimensions({
       inputWidth: INPUT_DISPLAY_WIDTH / this.state.scale,
       inputHeight: INPUT_DISPLAY_HEIGHT / this.state.scale,
-      layerType: this.state.selectedLayerType,
       ...this.getLayerSpecificParams(this.state)
     });
 
     this.state.outputDataWidth = outputDataWidth;
     this.state.outputDataHeight = outputDataHeight;
+  }
+
+  getScale() {
+    const { selectedInputType, selectedImage } = this.state;
+
+    return selectedInputType === INPUT_TYPES.IMAGE ? selectedImage.scale : 1;
   }
 
   getLayerSpecificParams(state) {
@@ -183,17 +185,18 @@ export default class App extends React.Component {
       this.drawOutput();
     } else if (
       selectedInputType !== prevState.selectedInputType ||
-      selectedImage !== prevState.selectedImage
+      selectedImage !== prevState.selectedImage ||
+      selectedLayerType !== prevState.selectedLayerType ||
+      convStride !== prevState.convStride ||
+      poolStride !== prevState.poolStride
     ) {
-      const newScale =
-        selectedInputType === INPUT_TYPES.IMAGE ? selectedImage.scale : 1;
+      const newScale = this.getScale();
       const {
         outputWidth: outputDataWidth,
         outputHeight: outputDataHeight
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / newScale,
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
-        layerType: selectedLayerType,
         ...this.getLayerSpecificParams(this.state)
       });
 
@@ -201,21 +204,6 @@ export default class App extends React.Component {
         outputDataWidth,
         outputDataHeight,
         scale: newScale
-      });
-    } else if (selectedLayerType !== prevState.selectedLayerType) {
-      const {
-        outputWidth: outputDataWidth,
-        outputHeight: outputDataHeight
-      } = getOutputDimensions({
-        inputWidth: INPUT_DISPLAY_WIDTH / scale,
-        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
-        layerType: selectedLayerType,
-        ...this.getLayerSpecificParams(this.state)
-      });
-
-      this.setState({
-        outputDataWidth,
-        outputDataHeight
       });
     }
   }
@@ -233,7 +221,7 @@ export default class App extends React.Component {
 
     switch (selectedLayerType) {
       case LAYER_TYPES.CONV: {
-        const { convFilters, selectedConvFilterIndex } = this.state;
+        const { convFilters, selectedConvFilterIndex, convStride } = this.state;
         const { filter, filterSize } = convFilters[selectedConvFilterIndex];
 
         ({ outputData } = convolve({
@@ -242,6 +230,7 @@ export default class App extends React.Component {
           inputData,
           filter,
           filterSize,
+          stride: convStride,
           outputWidth: outputDataWidth,
           outputHeight: outputDataHeight
         }));
@@ -296,6 +285,12 @@ export default class App extends React.Component {
     });
   };
 
+  onConvStrideChange = convStride => {
+    this.setState({
+      convStride
+    });
+  };
+
   onConvFilterIndexChange = selectedConvFilterIndex => {
     this.setState(state => {
       const {
@@ -304,7 +299,6 @@ export default class App extends React.Component {
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
-        layerType: state.selectedLayerType,
         filterSize: state.convFilters[selectedConvFilterIndex].filterSize,
         stride: state.convStride
       });
@@ -341,7 +335,6 @@ export default class App extends React.Component {
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
-        layerType: state.selectedLayerType,
         filterSize,
         stride: state.convStride
       });
@@ -355,6 +348,12 @@ export default class App extends React.Component {
     });
   };
 
+  onPoolStrideChange = poolStride => {
+    this.setState({
+      poolStride
+    });
+  };
+
   render() {
     const {
       outputDataWidth,
@@ -362,8 +361,10 @@ export default class App extends React.Component {
       selectedInputType,
       selectedImage,
       selectedLayerType,
+      convStride,
       convFilters,
       selectedConvFilterIndex,
+      poolStride,
       scale
     } = this.state;
 
@@ -405,10 +406,14 @@ export default class App extends React.Component {
           onInputTypeChange={this.onInputTypeChange}
           selectedLayerType={selectedLayerType}
           onLayerTypeChange={this.onLayerTypeChange}
+          convStride={convStride}
+          onConvStrideChange={this.onConvStrideChange}
           convFilters={convFilters}
           selectedConvFilterIndex={selectedConvFilterIndex}
           onConvFilterIndexChange={this.onConvFilterIndexChange}
           onConvFilterMatrixChange={this.onConvFilterMatrixChange}
+          poolStride={poolStride}
+          onPoolStrideChange={this.onPoolStrideChange}
         />
       </div>
     );

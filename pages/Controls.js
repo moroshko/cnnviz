@@ -15,6 +15,14 @@ export default class Controls extends React.Component {
     this.props.onLayerTypeChange(event.target.value);
   };
 
+  onConvStrideChange = event => {
+    this.props.onConvStrideChange(parseInt(event.target.value, 10));
+  };
+
+  onPoolStrideChange = event => {
+    this.props.onPoolStrideChange(parseInt(event.target.value, 10));
+  };
+
   onConvFilterIndexChange = event => {
     const { onConvFilterIndexChange } = this.props;
 
@@ -25,9 +33,13 @@ export default class Controls extends React.Component {
     const {
       selectedInputType,
       selectedLayerType,
+      convStride,
+      onConvStrideChange,
       convFilters,
       selectedConvFilterIndex,
-      onConvFilterMatrixChange
+      onConvFilterMatrixChange,
+      poolStride,
+      onPoolStrideChange
     } = this.props;
 
     return (
@@ -62,6 +74,32 @@ export default class Controls extends React.Component {
             </label>
           ))}
         </div>
+        {selectedLayerType === LAYER_TYPES.CONV && (
+          <div>
+            Stride:
+            <input
+              type="range"
+              min="1"
+              max="5"
+              value={convStride}
+              onChange={this.onConvStrideChange}
+            />
+            {convStride}
+          </div>
+        )}
+        {selectedLayerType === LAYER_TYPES.POOL && (
+          <div>
+            Stride:
+            <input
+              type="range"
+              min="1"
+              max="5"
+              value={poolStride}
+              onChange={this.onPoolStrideChange}
+            />
+            {poolStride}
+          </div>
+        )}
         {selectedLayerType === LAYER_TYPES.CONV && (
           <div style={{ display: "flex" }}>
             Filter:

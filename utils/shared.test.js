@@ -2,13 +2,13 @@ const { LAYER_TYPES } = require("./constants");
 const { getOutputDimensions } = require("./shared");
 
 describe("getOutputDimensions", () => {
-  it("CONV layer", () => {
+  it("filterSize = 3 and stride = 1", () => {
     expect(
       getOutputDimensions({
         inputWidth: 13,
         inputHeight: 8,
-        layerType: LAYER_TYPES.CONV,
-        filterSize: 3
+        filterSize: 3,
+        stride: 1
       })
     ).toEqual({
       outputWidth: 11,
@@ -16,12 +16,11 @@ describe("getOutputDimensions", () => {
     });
   });
 
-  it("POOL layer", () => {
+  it("filterSize = 3 and stride = 2", () => {
     expect(
       getOutputDimensions({
         inputWidth: 13,
         inputHeight: 8,
-        layerType: LAYER_TYPES.POOL,
         filterSize: 3,
         stride: 2
       })

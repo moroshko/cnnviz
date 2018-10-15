@@ -1,19 +1,4 @@
-const { getConvolutionOutputDimensions, convolve } = require("./convolution");
-
-describe("getConvolutionOutputDimensions", () => {
-  it("returns the correct output width and height", () => {
-    expect(
-      getConvolutionOutputDimensions({
-        inputWidth: 11,
-        inputHeight: 8,
-        filterSize: 3
-      })
-    ).toEqual({
-      outputWidth: 9,
-      outputHeight: 6
-    });
-  });
-});
+const { convolve } = require("./convolution");
 
 describe("convolve", () => {
   it("filterSize = 3 with integer values", () => {
@@ -45,6 +30,7 @@ describe("convolve", () => {
           3,  0,  6,
           7, -1,  2
         ],
+        stride: 1,
         outputWidth: 2,
         outputHeight: 3
       })
@@ -84,6 +70,7 @@ describe("convolve", () => {
           0.125, 0.5,
           -0.25, 0.1
         ],
+        stride: 1,
         outputWidth: 3,
         outputHeight: 4
       })
@@ -94,6 +81,45 @@ describe("convolve", () => {
         199, 125, 211, 255,      0, 247, 224, 255,    255, 140, 196, 255,
         166,  81,  35, 255,     30, 153,  66, 255,    208, 133,   0, 255,
         163,   0, 100, 255,     96, 130, 207, 255,    244, 150,  35, 255
+      ])
+    });
+  });
+
+  it("filterSize = 3 with stride = 2", () => {
+    expect(
+      convolve({
+        inputWidth: 4,
+        inputHeight: 5,
+        // prettier-ignore
+        inputData: [
+           33, 205, 223,  24,     41, 238, 232, 249,     93,  54, 238,  66,     110,  78,  15, 117,
+          156, 145, 209,  30,    175,  91, 158, 116,     17, 211, 222, 239,     223, 116, 158, 235,
+           91,  49,  27, 211,    165,  61,  90, 133,     23, 121,  58, 100,     237, 104,  72,  36,
+          108,   7, 192,  43,    158,  26, 128, 201,    151,  90, 217,   3,     221, 168,  55, 155,
+          135,  64, 226, 128,    222,  23, 165, 208,     44, 177, 216, 183,      70, 183, 124, 198,
+        ],
+        filterSize: 3,
+        // prettier-ignore
+        filter: [
+          4,  6, -8,
+          3,  0,  6,
+          7, -1,  2
+        ],
+        stride: 2,
+        outputWidth: 1,
+        outputHeight: 2
+      })
+    ).toEqual({
+      /*
+        Red channel:       Green channel:      Blue channel:
+
+          722               4041                2554
+         3211                934                3911
+      */
+      // prettier-ignore
+      outputData: new Uint8ClampedArray([
+          0, 255,   0, 255,
+        255,   0, 255, 255
       ])
     });
   });

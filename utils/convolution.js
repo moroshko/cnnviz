@@ -1,21 +1,10 @@
-function getConvolutionOutputDimensions({
-  inputWidth,
-  inputHeight,
-  filterSize
-}) {
-  return {
-    outputWidth: inputWidth - filterSize + 1,
-    outputHeight: inputHeight - filterSize + 1
-  };
-}
-
 function convolutionStep({
   inputWidth,
   inputData,
   filterSize,
   filter,
   topLeftIndex,
-  outputWidthTimes4,
+  inputDataIndexNextRowStep,
   channel,
   min,
   max
@@ -34,7 +23,7 @@ function convolutionStep({
       inputWidth ===
       filterSize - 1
     ) {
-      inputDataIndex += outputWidthTimes4;
+      inputDataIndex += inputDataIndexNextRowStep;
     } else {
       inputDataIndex += 4;
     }
@@ -53,22 +42,30 @@ function convolve({
   inputData,
   filterSize,
   filter,
+  stride,
   outputWidth,
   outputHeight
 }) {
   const outputSize = (outputWidth * outputHeight) << 2;
   const outputArray = new Array(outputSize);
-  const lastTopLeftIndex = (inputWidth * outputHeight - filterSize) << 2;
+  const topLeftIndexStep = stride << 2;
+  const lastTopLeftIndexOnFirstRow = ((outputWidth - 1) * stride) << 2;
+  const inputWidthTimes4 = inputWidth << 2;
+  const topLeftIndexNextRowStep =
+    inputWidthTimes4 * stride - lastTopLeftIndexOnFirstRow;
+  const inputDataIndexNextRowStep = (inputWidth - filterSize + 1) << 2;
+  const lastTopLeftIndex =
+    (inputWidth * ((outputHeight - 1) * stride + 1) - filterSize) << 2;
   const filterSizeTimes4 = filterSize << 2;
   const outputWidthTimes4 = outputWidth << 2;
   let topLeftIndex = 0;
   let outputArrayIndex = 0;
-  let minValues = [
+  const minValues = [
     Infinity, // red
     Infinity, // green
     Infinity // blue
   ];
-  let maxValues = [
+  const maxValues = [
     -Infinity, // red
     -Infinity, // green
     -Infinity // blue
@@ -82,7 +79,7 @@ function convolve({
       filterSize,
       filter,
       topLeftIndex,
-      outputWidthTimes4,
+      inputDataIndexNextRowStep,
       channel: 0,
       min: minValues[0],
       max: maxValues[0]
@@ -98,7 +95,7 @@ function convolve({
       filterSize,
       filter,
       topLeftIndex,
-      outputWidthTimes4,
+      inputDataIndexNextRowStep,
       channel: 1,
       min: minValues[1],
       max: maxValues[1]
@@ -114,7 +111,7 @@ function convolve({
       filterSize,
       filter,
       topLeftIndex,
-      outputWidthTimes4,
+      inputDataIndexNextRowStep,
       channel: 2,
       min: minValues[2],
       max: maxValues[2]
@@ -125,10 +122,10 @@ function convolve({
 
     outputArrayIndex += 1; // skip alpha
 
-    if ((topLeftIndex >> 2) % inputWidth === inputWidth - filterSize) {
-      topLeftIndex += filterSizeTimes4;
+    if (topLeftIndex % inputWidthTimes4 === lastTopLeftIndexOnFirstRow) {
+      topLeftIndex += topLeftIndexNextRowStep;
     } else {
-      topLeftIndex += 4;
+      topLeftIndex += topLeftIndexStep;
     }
   }
 
@@ -170,6 +167,5 @@ function convolve({
 }
 
 module.exports = {
-  getConvolutionOutputDimensions,
   convolve
 };
