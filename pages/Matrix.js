@@ -2,26 +2,6 @@ import React, { Fragment } from "react";
 import range from "lodash.range";
 
 export default class Matrix extends React.Component {
-  state = {
-    data: this.props.initialData,
-    errors: this.getErrors(this.props.initialData)
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    const { onUpdate } = this.props;
-    const { data } = this.state;
-
-    if (data !== prevState.data) {
-      onUpdate(data);
-    }
-  }
-
-  getData() {
-    const { data } = this.state;
-
-    return data;
-  }
-
   getDataIndex(row, column) {
     const { columns } = this.props;
 
@@ -33,8 +13,7 @@ export default class Matrix extends React.Component {
   }
 
   render() {
-    const { rows, columns } = this.props;
-    const { data, errors } = this.state;
+    const { isEditable, rows, columns, data, errors, onChange } = this.props;
 
     return (
       <Fragment>
@@ -54,22 +33,17 @@ export default class Matrix extends React.Component {
                           className={errors[dataIndex] && "withError"}
                           type="number"
                           step={0.1}
+                          disabled={!isEditable}
                           value={data[dataIndex]}
                           onChange={event => {
                             const value = parseFloat(event.target.value);
+                            const newData = data.slice();
 
-                            this.setState(({ data }) => {
-                              const newData = data.slice();
+                            newData[dataIndex] = isNaN(value) ? "" : value;
 
-                              newData[dataIndex] = isNaN(value) ? "" : value;
+                            const newErrors = this.getErrors(newData);
 
-                              const newErrors = this.getErrors(newData);
-
-                              return {
-                                data: newData,
-                                errors: newErrors
-                              };
-                            });
+                            onChange(newData, newErrors);
                           }}
                         />
                       </td>

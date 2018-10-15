@@ -2,14 +2,11 @@ import {
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
-  LAYER_TYPES_LABELS,
-  CONV_FILTERS
+  LAYER_TYPES_LABELS
 } from "../utils/constants";
 import Matrix from "./Matrix";
 
 export default class Controls extends React.Component {
-  matrices = [];
-
   onInputTypeChange = event => {
     this.props.onInputTypeChange(event.target.value);
   };
@@ -18,12 +15,19 @@ export default class Controls extends React.Component {
     this.props.onLayerTypeChange(event.target.value);
   };
 
+  onConvFilterIndexChange = event => {
+    const { onConvFilterIndexChange } = this.props;
+
+    onConvFilterIndexChange(parseInt(event.target.value, 10));
+  };
+
   render() {
     const {
       selectedInputType,
       selectedLayerType,
-      selectedConvFilter,
-      onConvFilterChange
+      convFilters,
+      selectedConvFilterIndex,
+      onConvFilterMatrixChange
     } = this.props;
 
     return (
@@ -61,47 +65,30 @@ export default class Controls extends React.Component {
         {selectedLayerType === LAYER_TYPES.CONV && (
           <div style={{ display: "flex" }}>
             Filter:
-            {CONV_FILTERS.map((convFilter, index) => {
-              const filterSize = Math.sqrt(convFilter.filter.length);
-
-              return (
-                <div style={{ marginLeft: index > 0 ? 50 : 0 }} key={index}>
-                  <label>
-                    <input
-                      type="radio"
-                      name="convFilter"
-                      value={index}
-                      checked={
-                        CONV_FILTERS[index].name === selectedConvFilter.name
-                      }
-                      onChange={event => {
-                        onConvFilterChange({
-                          ...convFilter,
-                          filter: this.matrices[event.target.value].getData()
-                        });
-                      }}
-                    />
-                    {convFilter.name}
-                  </label>
-                  <Matrix
-                    rows={filterSize}
-                    columns={filterSize}
-                    initialData={convFilter.filter}
-                    onUpdate={data => {
-                      onConvFilterChange({
-                        ...convFilter,
-                        filter: data
-                      });
-                    }}
-                    ref={matrix => {
-                      if (matrix !== null) {
-                        this.matrices[index] = matrix;
-                      }
-                    }}
+            {convFilters.map((convFilter, index) => (
+              <div style={{ marginLeft: index > 0 ? 50 : 0 }} key={index}>
+                <label>
+                  <input
+                    type="radio"
+                    name="convFilter"
+                    value={index}
+                    checked={index === selectedConvFilterIndex}
+                    onChange={this.onConvFilterIndexChange}
                   />
-                </div>
-              );
-            })}
+                  {convFilter.name}
+                </label>
+                <Matrix
+                  isEditable={convFilter.isEditable}
+                  rows={convFilter.filterSize}
+                  columns={convFilter.filterSize}
+                  data={convFilter.filter}
+                  errors={convFilter.errors}
+                  onChange={(data, errors) => {
+                    onConvFilterMatrixChange(index, data, errors);
+                  }}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>
