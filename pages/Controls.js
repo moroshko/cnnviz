@@ -19,14 +19,20 @@ export default class Controls extends React.Component {
     this.props.onConvStrideChange(parseInt(event.target.value, 10));
   };
 
-  onPoolStrideChange = event => {
-    this.props.onPoolStrideChange(parseInt(event.target.value, 10));
-  };
-
   onConvFilterIndexChange = event => {
     const { onConvFilterIndexChange } = this.props;
 
     onConvFilterIndexChange(parseInt(event.target.value, 10));
+  };
+
+  onPoolFilterSizeChange = event => {
+    const { onPoolFilterSizeChange } = this.props;
+
+    onPoolFilterSizeChange(parseInt(event.target.value, 10));
+  };
+
+  onPoolStrideChange = event => {
+    this.props.onPoolStrideChange(parseInt(event.target.value, 10));
   };
 
   render() {
@@ -38,6 +44,7 @@ export default class Controls extends React.Component {
       convFilters,
       selectedConvFilterIndex,
       onConvFilterMatrixChange,
+      poolFilterSize,
       poolStride,
       onPoolStrideChange
     } = this.props;
@@ -85,6 +92,19 @@ export default class Controls extends React.Component {
               onChange={this.onConvStrideChange}
             />
             {convStride}
+          </div>
+        )}
+        {selectedLayerType === LAYER_TYPES.POOL && (
+          <div>
+            Filter Size:
+            <input
+              type="range"
+              min="1"
+              max="5"
+              value={poolFilterSize}
+              onChange={this.onPoolFilterSizeChange}
+            />
+            {poolFilterSize}
           </div>
         )}
         {selectedLayerType === LAYER_TYPES.POOL && (

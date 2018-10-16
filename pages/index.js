@@ -61,18 +61,6 @@ const INITIAL_CONV_FILTERS = [
   errors: convFilter.filter.map(_ => false)
 }));
 
-const INITIAL_POOL_FILTERS = [
-  {
-    filterSize: 2
-  },
-  {
-    filterSize: 4
-  },
-  {
-    filterSize: 8
-  }
-];
-
 const IMAGES = [
   {
     src: "/static/digit_4.jpg",
@@ -89,14 +77,13 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      selectedInputType: INPUT_TYPES.CAMERA,
+      selectedInputType: INPUT_TYPES.IMAGE,
       selectedImage: IMAGES[1],
       selectedLayerType: LAYER_TYPES.CONV,
       convFilters: INITIAL_CONV_FILTERS,
       selectedConvFilterIndex: 2,
       convStride: 1,
-      poolFilters: INITIAL_POOL_FILTERS,
-      selectedPoolFilterIndex: 0,
+      poolFilterSize: 2,
       poolStride: 2
     };
 
@@ -135,10 +122,10 @@ export default class App extends React.Component {
       }
 
       case LAYER_TYPES.POOL: {
-        const { poolFilters, selectedPoolFilterIndex, poolStride } = state;
+        const { poolFilterSize, poolStride } = state;
 
         return {
-          filterSize: poolFilters[selectedPoolFilterIndex].filterSize,
+          filterSize: poolFilterSize,
           stride: poolStride
         };
       }
@@ -157,18 +144,14 @@ export default class App extends React.Component {
       convFilters,
       selectedConvFilterIndex,
       convStride,
-      poolFilters,
-      selectedPoolFilterIndex,
-      poolStride,
-      scale,
-      outputDataWidth,
-      outputDataHeight
+      poolFilterSize,
+      poolStride
     } = this.state;
 
     if (
-      outputDataWidth !== prevState.outputDataWidth ||
-      outputDataHeight !== prevState.outputDataHeight ||
-      selectedConvFilterIndex !== prevState.selectedConvFilterIndex ||
+      selectedInputType !== prevState.selectedInputType ||
+      selectedImage !== prevState.selectedImage ||
+      selectedLayerType !== prevState.selectedLayerType ||
       (!isEqual(
         convFilters[selectedConvFilterIndex].filter,
         prevState.convFilters[prevState.selectedConvFilterIndex].filter
@@ -176,18 +159,8 @@ export default class App extends React.Component {
         convFilters[selectedConvFilterIndex].errors.every(
           error => error === false
         )) ||
-      selectedPoolFilterIndex !== prevState.selectedPoolFilterIndex ||
-      !isEqual(
-        poolFilters[selectedPoolFilterIndex].filterSize,
-        prevState.poolFilters[prevState.selectedPoolFilterIndex].filterSize
-      )
-    ) {
-      this.drawOutput();
-    } else if (
-      selectedInputType !== prevState.selectedInputType ||
-      selectedImage !== prevState.selectedImage ||
-      selectedLayerType !== prevState.selectedLayerType ||
       convStride !== prevState.convStride ||
+      poolFilterSize !== prevState.poolFilterSize ||
       poolStride !== prevState.poolStride
     ) {
       const newScale = this.getScale();
@@ -200,11 +173,14 @@ export default class App extends React.Component {
         ...this.getLayerSpecificParams(this.state)
       });
 
-      this.setState({
-        outputDataWidth,
-        outputDataHeight,
-        scale: newScale
-      });
+      this.setState(
+        {
+          outputDataWidth,
+          outputDataHeight,
+          scale: newScale
+        },
+        this.drawOutput
+      );
     }
   }
 
@@ -238,14 +214,13 @@ export default class App extends React.Component {
       }
 
       case LAYER_TYPES.POOL: {
-        const { poolFilters, selectedPoolFilterIndex, poolStride } = this.state;
-        const { filterSize } = poolFilters[selectedPoolFilterIndex];
+        const { poolFilterSize, poolStride } = this.state;
 
         ({ outputData } = pool({
           inputWidth: INPUT_DISPLAY_WIDTH / scale,
           inputHeight: INPUT_DISPLAY_HEIGHT / scale,
           inputData,
-          filterSize,
+          filterSize: poolFilterSize,
           stride: poolStride,
           outputWidth: outputDataWidth,
           outputHeight: outputDataHeight
@@ -292,6 +267,10 @@ export default class App extends React.Component {
   };
 
   onConvFilterIndexChange = selectedConvFilterIndex => {
+    this.setState({
+      selectedConvFilterIndex
+    });
+    /*
     this.setState(state => {
       const {
         outputWidth: outputDataWidth,
@@ -308,7 +287,7 @@ export default class App extends React.Component {
         outputDataWidth,
         outputDataHeight
       };
-    });
+    });*/
   };
 
   onConvFilterMatrixChange = (selectedConvFilterIndex, filter, errors) => {
@@ -348,6 +327,26 @@ export default class App extends React.Component {
     });
   };
 
+  onPoolFilterSizeChange = poolFilterSize => {
+    this.setState(state => {
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
+        filterSize: poolFilterSize,
+        stride: state.poolStride
+      });
+
+      return {
+        poolFilterSize,
+        outputDataWidth,
+        outputDataHeight
+      };
+    });
+  };
+
   onPoolStrideChange = poolStride => {
     this.setState({
       poolStride
@@ -364,6 +363,7 @@ export default class App extends React.Component {
       convStride,
       convFilters,
       selectedConvFilterIndex,
+      poolFilterSize,
       poolStride,
       scale
     } = this.state;
@@ -412,6 +412,8 @@ export default class App extends React.Component {
           selectedConvFilterIndex={selectedConvFilterIndex}
           onConvFilterIndexChange={this.onConvFilterIndexChange}
           onConvFilterMatrixChange={this.onConvFilterMatrixChange}
+          poolFilterSize={poolFilterSize}
+          onPoolFilterSizeChange={this.onPoolFilterSizeChange}
           poolStride={poolStride}
           onPoolStrideChange={this.onPoolStrideChange}
         />
