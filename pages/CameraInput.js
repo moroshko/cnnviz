@@ -1,5 +1,3 @@
-import { getOutputDimensions } from "../utils/shared";
-
 export default class CameraInput extends React.Component {
   componentDidMount() {
     const { width, height } = this.props;

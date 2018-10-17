@@ -1,5 +1,3 @@
-import { getOutputDimensions } from "../utils/shared";
-
 export default class ImageInput extends React.Component {
   componentDidMount() {
     const { src } = this.props;

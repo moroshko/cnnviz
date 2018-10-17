@@ -57,6 +57,7 @@ strides.forEach(stride => {
           inputWidth: INPUT_DISPLAY_WIDTH,
           inputHeight: INPUT_DISPLAY_HEIGHT,
           filterSize,
+          padding: 0,
           stride
         })
       });

@@ -4,7 +4,7 @@ function getOutputDimensions({
   inputWidth,
   inputHeight,
   filterSize,
-  padding = 0,
+  padding,
   stride
 }) {
   const twicePadding = padding << 1;

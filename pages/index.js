@@ -3,7 +3,7 @@ import ImageInput from "./ImageInput";
 import CameraInput from "./CameraInput";
 import Output from "./Output";
 import Controls from "./Controls";
-import { getOutputDimensions } from "../utils/shared";
+import { getOutputDimensions, addPadding } from "../utils/shared";
 import { convolve } from "../utils/convolution";
 import { pool } from "../utils/pooling";
 import {
@@ -95,6 +95,7 @@ export default class App extends React.Component {
     } = getOutputDimensions({
       inputWidth: INPUT_DISPLAY_WIDTH / this.state.scale,
       inputHeight: INPUT_DISPLAY_HEIGHT / this.state.scale,
+      padding: 0,
       ...this.getLayerSpecificParams(this.state)
     });
 
@@ -170,6 +171,7 @@ export default class App extends React.Component {
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / newScale,
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
+        padding: 0,
         ...this.getLayerSpecificParams(this.state)
       });
 
@@ -270,24 +272,6 @@ export default class App extends React.Component {
     this.setState({
       selectedConvFilterIndex
     });
-    /*
-    this.setState(state => {
-      const {
-        outputWidth: outputDataWidth,
-        outputHeight: outputDataHeight
-      } = getOutputDimensions({
-        inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
-        inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
-        filterSize: state.convFilters[selectedConvFilterIndex].filterSize,
-        stride: state.convStride
-      });
-
-      return {
-        selectedConvFilterIndex,
-        outputDataWidth,
-        outputDataHeight
-      };
-    });*/
   };
 
   onConvFilterMatrixChange = (selectedConvFilterIndex, filter, errors) => {
@@ -315,6 +299,7 @@ export default class App extends React.Component {
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
         filterSize,
+        padding: 0,
         stride: state.convStride
       });
 
@@ -336,6 +321,7 @@ export default class App extends React.Component {
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
         filterSize: poolFilterSize,
+        padding: 0,
         stride: state.poolStride
       });
 
