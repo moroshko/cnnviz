@@ -43,22 +43,34 @@ export default class Output extends React.Component {
 
   render() {
     const { dataWidth, dataHeight, scale } = this.props;
+    const displayWidth = dataWidth * scale;
+    const displayHeight = dataHeight * scale;
 
     return (
       <div>
         <canvas
-          style={{
-            display: "none"
-          }}
+          className="dataCanvas"
           width={dataWidth}
           height={dataHeight}
           ref={this.dataCanvasRef}
         />
         <canvas
-          width={dataWidth * scale}
-          height={dataHeight * scale}
+          width={displayWidth}
+          height={displayHeight}
           ref={this.displayCanvasRef}
         />
+        <div className="dimensions">
+          {displayWidth} × {displayHeight}
+        </div>
+        <style jsx>{`
+          .dataCanvas {
+            display: none;
+          }
+          .dimensions {
+            font-size: 12px;
+            text-align: right;
+          }
+        `}</style>
       </div>
     );
   }

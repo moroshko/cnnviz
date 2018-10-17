@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { getOutputDimensions } from "../utils/shared";
 
 export default class CameraInput extends React.Component {
@@ -18,10 +17,10 @@ export default class CameraInput extends React.Component {
       .catch(console.error);
 
     // Flip the canvas horizontally
-    this.canvasContext.translate(width, 0);
-    this.canvasContext.scale(-1, 1);
+    this.dataCanvasContext.translate(width, 0);
+    this.dataCanvasContext.scale(-1, 1);
 
-    this.canvasContext.drawImage(this.video, 0, 0, width, height);
+    this.dataCanvasContext.drawImage(this.video, 0, 0, width, height);
 
     this.requestID = requestAnimationFrame(this.update);
   }
@@ -29,7 +28,7 @@ export default class CameraInput extends React.Component {
   update = () => {
     const { width, height, onUpdate } = this.props;
 
-    this.canvasContext.drawImage(this.video, 0, 0, width, height);
+    this.dataCanvasContext.drawImage(this.video, 0, 0, width, height);
 
     onUpdate();
 
@@ -45,9 +44,9 @@ export default class CameraInput extends React.Component {
     }
   }
 
-  canvasRef = canvas => {
+  dataCanvasRef = canvas => {
     if (canvas !== null) {
-      this.canvasContext = canvas.getContext("2d", {
+      this.dataCanvasContext = canvas.getContext("2d", {
         alpha: false
       });
     }
@@ -62,29 +61,32 @@ export default class CameraInput extends React.Component {
   getInputData() {
     const { width, height } = this.props;
 
-    return this.canvasContext.getImageData(0, 0, width, height).data;
+    return this.dataCanvasContext.getImageData(0, 0, width, height).data;
   }
 
   render() {
     const { width, height } = this.props;
 
     return (
-      <Fragment>
-        <canvas
-          style={{
-            display: "none"
-          }}
-          width={width}
-          height={height}
-          ref={this.canvasRef}
-        />
-        <video
-          style={{ transform: "rotateY(180deg)" }}
-          width={width}
-          height={height}
-          ref={this.videoRef}
-        />
-      </Fragment>
+      <div>
+        <canvas width={width} height={height} ref={this.dataCanvasRef} />
+        <video width={width} height={height} ref={this.videoRef} />
+        <div className="dimensions">
+          {width} × {height}
+        </div>
+        <style jsx>{`
+          canvas {
+            display: none;
+          }
+          video {
+            transform: rotateY(180deg);
+          }
+          .dimensions {
+            font-size: 12px;
+            text-align: right;
+          }
+        `}</style>
+      </div>
     );
   }
 }

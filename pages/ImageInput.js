@@ -78,9 +78,7 @@ export default class ImageInput extends React.Component {
     return (
       <div>
         <canvas
-          style={{
-            display: "none"
-          }}
+          className="dataCanvas"
           width={displayWidth / scale}
           height={displayHeight / scale}
           ref={this.dataCanvasRef}
@@ -90,6 +88,18 @@ export default class ImageInput extends React.Component {
           height={displayHeight}
           ref={this.displayCanvasRef}
         />
+        <div className="dimensions">
+          {displayWidth} × {displayHeight}
+        </div>
+        <style jsx>{`
+          .dataCanvas {
+            display: none;
+          }
+          .dimensions {
+            font-size: 12px;
+            text-align: right;
+          }
+        `}</style>
       </div>
     );
   }
