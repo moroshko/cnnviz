@@ -1,32 +1,72 @@
+import { Fragment } from "react";
+import { MAX_PADDING } from "../utils/constants";
+
 export default class CameraInput extends React.Component {
   componentDidMount() {
-    const { width, height } = this.props;
+    const { displayWidth, displayHeight } = this.props;
 
     navigator.mediaDevices
       .getUserMedia({
-        video: { width, height },
+        video: { displayWidth, displayHeight },
         audio: false
       })
       .then(stream => {
         this.stream = stream;
+
         this.video.srcObject = stream;
         this.video.play();
+
+        this.update();
       })
       .catch(console.error);
+  }
 
-    // Flip the canvas horizontally
-    this.dataCanvasContext.translate(width, 0);
-    this.dataCanvasContext.scale(-1, 1);
+  getInputData() {
+    if (!this.displayCanvasContext) {
+      return {
+        inputWidth: null,
+        inputHeight: null,
+        inputData: null
+      };
+    }
 
-    this.dataCanvasContext.drawImage(this.video, 0, 0, width, height);
+    const {
+      width: inputWidth,
+      height: inputHeight
+    } = this.displayCanvasContext.canvas;
+    const { data: inputData } = this.displayCanvasContext.getImageData(
+      0,
+      0,
+      inputWidth,
+      inputHeight
+    );
 
-    this.requestID = requestAnimationFrame(this.update);
+    return {
+      inputWidth,
+      inputHeight,
+      inputData
+    };
   }
 
   update = () => {
-    const { width, height, onUpdate } = this.props;
+    const { padding, onUpdate } = this.props;
 
-    this.dataCanvasContext.drawImage(this.video, 0, 0, width, height);
+    /*
+      The transformation matrix is restored to identity matrix whenever canvas
+      dimensions change. Instead of tracking this change, we just set the
+      transformation matrix every time before drawing.
+      The matrix below performs a horizontal flip of the image.
+    */
+    // prettier-ignore
+    this.displayCanvasContext.setTransform(-1, 0, 0, 1, this.displayCanvasContext.canvas.width, 0);
+
+    this.displayCanvasContext.drawImage(
+      this.video,
+      padding,
+      padding,
+      this.video.width,
+      this.video.height
+    );
 
     onUpdate();
 
@@ -42,9 +82,9 @@ export default class CameraInput extends React.Component {
     }
   }
 
-  dataCanvasRef = canvas => {
+  displayCanvasRef = canvas => {
     if (canvas !== null) {
-      this.dataCanvasContext = canvas.getContext("2d", {
+      this.displayCanvasContext = canvas.getContext("2d", {
         alpha: false
       });
     }
@@ -56,35 +96,53 @@ export default class CameraInput extends React.Component {
     }
   };
 
-  getInputData() {
-    const { width, height } = this.props;
-
-    return this.dataCanvasContext.getImageData(0, 0, width, height).data;
-  }
-
   render() {
-    const { width, height } = this.props;
+    const { displayWidth, displayHeight, padding, scale } = this.props;
+    const twicePadding = padding << 1;
+    const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
+    const containerWhitespace = displayCanvasTranslate << 1;
 
     return (
-      <div>
-        <canvas width={width} height={height} ref={this.dataCanvasRef} />
-        <video width={width} height={height} ref={this.videoRef} />
+      <Fragment>
+        <div className="container">
+          <canvas
+            className="displayCanvas"
+            width={displayWidth / scale}
+            height={displayHeight / scale}
+            ref={this.displayCanvasRef}
+          />
+          <video
+            width={displayWidth - scale * twicePadding}
+            height={displayHeight - scale * twicePadding}
+            ref={this.videoRef}
+          />
+        </div>
         <div className="dimensions">
-          {width} × {height}
+          {`${displayWidth - scale * twicePadding} × ${displayHeight -
+            scale * twicePadding}${
+            padding === 0 ? "" : ` (+ Padding = ${padding})`
+          }`}
         </div>
         <style jsx>{`
-          canvas {
-            display: none;
+          .container {
+            width: ${displayWidth + containerWhitespace}px;
+            height: ${displayHeight + containerWhitespace}px;
+          }
+          .displayCanvas {
+            transform: translate(
+              ${displayCanvasTranslate}px,
+              ${displayCanvasTranslate}px
+            );
           }
           video {
-            transform: rotateY(180deg);
+            display: none;
           }
           .dimensions {
             font-size: 12px;
-            text-align: right;
+            padding-left: ${MAX_PADDING * scale}px;
           }
         `}</style>
-      </div>
+      </Fragment>
     );
   }
 }

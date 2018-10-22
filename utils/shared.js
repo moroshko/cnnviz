@@ -16,23 +16,18 @@ function getOutputDimensions({
   };
 }
 
-function addPadding({
-  inputWidth,
-  inputHeight,
-  inputData,
-  padding,
-  outputWidth,
-  outputHeight
-}) {
-  const outputSize = (outputWidth * outputHeight) << 2;
-  const outputData = new Uint8ClampedArray(outputSize);
+function addPadding({ inputWidth, inputHeight, inputData, padding }) {
+  const inputWidthWithPadding = inputWidth + (padding << 1);
+  const inputHeightWithPadding = inputHeight + (padding << 1);
+  const outputSize = (inputWidthWithPadding * inputHeightWithPadding) << 2;
+  const inputDataWithPadding = new Uint8ClampedArray(outputSize);
   let inputDataIndex = 0;
   const inputDataIndexStep = inputWidth << 2;
-  let outputDataIndex = ((outputWidth + 1) * padding) << 2;
-  const outputDataIndexStep = outputWidth << 2;
+  let outputDataIndex = ((inputWidthWithPadding + 1) * padding) << 2;
+  const outputDataIndexStep = inputWidthWithPadding << 2;
 
   for (let h = 0; h < inputHeight; h++) {
-    outputData.set(
+    inputDataWithPadding.set(
       inputData.subarray(inputDataIndex, inputDataIndex + inputDataIndexStep),
       outputDataIndex
     );
@@ -42,7 +37,9 @@ function addPadding({
   }
 
   return {
-    outputData
+    inputWidthWithPadding,
+    inputHeightWithPadding,
+    inputDataWithPadding
   };
 }
 

@@ -1,9 +1,10 @@
+import { Fragment } from "react";
 import isEqual from "lodash.isequal";
 import ImageInput from "./ImageInput";
 import CameraInput from "./CameraInput";
 import Output from "./Output";
 import Controls from "./Controls";
-import { getOutputDimensions, addPadding } from "../utils/shared";
+import { getOutputDimensions } from "../utils/shared";
 import { convolve } from "../utils/convolution";
 import { pool } from "../utils/pooling";
 import {
@@ -12,7 +13,8 @@ import {
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
-  LAYER_TYPES_LABELS
+  LAYER_TYPES_LABELS,
+  MAX_PADDING
 } from "../utils/constants";
 
 // prettier-ignore
@@ -77,16 +79,17 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      selectedInputType: INPUT_TYPES.IMAGE,
-      selectedImage: IMAGES[1],
+      selectedInputType: INPUT_TYPES.CAMERA,
+      selectedImage: IMAGES[0],
       selectedLayerType: LAYER_TYPES.CONV,
       convFilters: INITIAL_CONV_FILTERS,
-      selectedConvFilterIndex: 2,
+      selectedConvFilterIndex: 3,
       convStride: 1,
       poolFilterSize: 2,
       poolStride: 2
     };
 
+    this.state.convPadding = this.getConvPadding();
     this.state.scale = this.getScale();
 
     const {
@@ -95,12 +98,17 @@ export default class App extends React.Component {
     } = getOutputDimensions({
       inputWidth: INPUT_DISPLAY_WIDTH / this.state.scale,
       inputHeight: INPUT_DISPLAY_HEIGHT / this.state.scale,
-      padding: 0,
       ...this.getLayerSpecificParams(this.state)
     });
 
     this.state.outputDataWidth = outputDataWidth;
     this.state.outputDataHeight = outputDataHeight;
+  }
+
+  getConvPadding() {
+    const { convFilters, selectedConvFilterIndex, convStride } = this.state;
+
+    return (convFilters[selectedConvFilterIndex].filterSize - convStride) >> 1;
   }
 
   getScale() {
@@ -114,10 +122,16 @@ export default class App extends React.Component {
 
     switch (selectedLayerType) {
       case LAYER_TYPES.CONV: {
-        const { convFilters, selectedConvFilterIndex, convStride } = state;
+        const {
+          convFilters,
+          selectedConvFilterIndex,
+          convPadding,
+          convStride
+        } = state;
 
         return {
           filterSize: convFilters[selectedConvFilterIndex].filterSize,
+          padding: convPadding,
           stride: convStride
         };
       }
@@ -127,6 +141,7 @@ export default class App extends React.Component {
 
         return {
           filterSize: poolFilterSize,
+          padding: 0,
           stride: poolStride
         };
       }
@@ -164,6 +179,7 @@ export default class App extends React.Component {
       poolFilterSize !== prevState.poolFilterSize ||
       poolStride !== prevState.poolStride
     ) {
+      const newConvPadding = this.getConvPadding();
       const newScale = this.getScale();
       const {
         outputWidth: outputDataWidth,
@@ -171,14 +187,17 @@ export default class App extends React.Component {
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / newScale,
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
-        padding: 0,
-        ...this.getLayerSpecificParams(this.state)
+        ...this.getLayerSpecificParams({
+          ...this.state,
+          convPadding: newConvPadding
+        })
       });
 
       this.setState(
         {
           outputDataWidth,
           outputDataHeight,
+          convPadding: newConvPadding,
           scale: newScale
         },
         this.drawOutput
@@ -194,7 +213,12 @@ export default class App extends React.Component {
       scale
     } = this.state;
 
-    const inputData = this.input.getInputData();
+    const { inputWidth, inputHeight, inputData } = this.input.getInputData();
+
+    if (inputData === null) {
+      return;
+    }
+
     let outputData;
 
     switch (selectedLayerType) {
@@ -203,9 +227,9 @@ export default class App extends React.Component {
         const { filter, filterSize } = convFilters[selectedConvFilterIndex];
 
         ({ outputData } = convolve({
-          inputWidth: INPUT_DISPLAY_WIDTH / scale,
-          inputHeight: INPUT_DISPLAY_HEIGHT / scale,
-          inputData,
+          inputWidth,
+          inputHeight,
+          inputData: inputData,
           filter,
           filterSize,
           stride: convStride,
@@ -219,8 +243,8 @@ export default class App extends React.Component {
         const { poolFilterSize, poolStride } = this.state;
 
         ({ outputData } = pool({
-          inputWidth: INPUT_DISPLAY_WIDTH / scale,
-          inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+          inputWidth,
+          inputHeight,
           inputData,
           filterSize: poolFilterSize,
           stride: poolStride,
@@ -269,9 +293,13 @@ export default class App extends React.Component {
   };
 
   onConvFilterIndexChange = selectedConvFilterIndex => {
-    this.setState({
-      selectedConvFilterIndex
-    });
+    this.setState(state => ({
+      selectedConvFilterIndex,
+      convStride: Math.min(
+        state.convStride,
+        state.convFilters[selectedConvFilterIndex].filterSize
+      )
+    }));
   };
 
   onConvFilterMatrixChange = (selectedConvFilterIndex, filter, errors) => {
@@ -288,7 +316,11 @@ export default class App extends React.Component {
       if (errors.some(error => error === true)) {
         return {
           selectedConvFilterIndex,
-          convFilters
+          convFilters,
+          convStride: Math.min(
+            state.convStride,
+            convFilters[selectedConvFilterIndex].filterSize
+          )
         };
       }
 
@@ -299,13 +331,17 @@ export default class App extends React.Component {
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
         filterSize,
-        padding: 0,
+        padding: state.convPadding,
         stride: state.convStride
       });
 
       return {
         selectedConvFilterIndex,
         convFilters,
+        convStride: Math.min(
+          state.convStride,
+          convFilters[selectedConvFilterIndex].filterSize
+        ),
         outputDataWidth,
         outputDataHeight
       };
@@ -346,6 +382,7 @@ export default class App extends React.Component {
       selectedInputType,
       selectedImage,
       selectedLayerType,
+      convPadding,
       convStride,
       convFilters,
       selectedConvFilterIndex,
@@ -353,57 +390,87 @@ export default class App extends React.Component {
       poolStride,
       scale
     } = this.state;
+    const inputPadding =
+      selectedLayerType === LAYER_TYPES.CONV ? convPadding : 0;
+    const displayWidth = INPUT_DISPLAY_WIDTH + scale * (inputPadding << 1);
+    const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (inputPadding << 1);
 
     return (
-      <div>
-        <div style={{ display: "flex" }}>
-          <div style={{ alignSelf: "flex-start" }}>
-            {selectedInputType === INPUT_TYPES.IMAGE && (
-              <ImageInput
-                displayWidth={INPUT_DISPLAY_WIDTH}
-                displayHeight={INPUT_DISPLAY_HEIGHT}
+      <Fragment>
+        <div className="container">
+          <div className="inputAndOutputContainer">
+            <div className="inputContainer">
+              {selectedInputType === INPUT_TYPES.IMAGE && (
+                <ImageInput
+                  displayWidth={displayWidth}
+                  displayHeight={displayHeight}
+                  padding={inputPadding}
+                  scale={scale}
+                  src={selectedImage.src}
+                  onUpdate={this.drawOutput}
+                  ref={this.inputRef}
+                />
+              )}
+              {selectedInputType === INPUT_TYPES.CAMERA && (
+                <CameraInput
+                  displayWidth={displayWidth}
+                  displayHeight={displayHeight}
+                  padding={inputPadding}
+                  scale={scale}
+                  onUpdate={this.drawOutput}
+                  ref={this.inputRef}
+                />
+              )}
+            </div>
+            <div className="outputContainer">
+              <Output
+                dataWidth={outputDataWidth}
+                dataHeight={outputDataHeight}
                 scale={scale}
-                src={selectedImage.src}
-                onUpdate={this.drawOutput}
-                ref={this.inputRef}
+                ref={this.outputRef}
               />
-            )}
-            {selectedInputType === INPUT_TYPES.CAMERA && (
-              <CameraInput
-                width={INPUT_DISPLAY_WIDTH}
-                height={INPUT_DISPLAY_HEIGHT}
-                scale={scale}
-                onUpdate={this.drawOutput}
-                ref={this.inputRef}
-              />
-            )}
+            </div>
           </div>
-          <div style={{ alignSelf: "flex-start", marginLeft: 20 }}>
-            <Output
-              dataWidth={outputDataWidth}
-              dataHeight={outputDataHeight}
-              scale={scale}
-              ref={this.outputRef}
-            />
-          </div>
+          <Controls
+            selectedInputType={selectedInputType}
+            onInputTypeChange={this.onInputTypeChange}
+            selectedLayerType={selectedLayerType}
+            onLayerTypeChange={this.onLayerTypeChange}
+            convStride={convStride}
+            onConvStrideChange={this.onConvStrideChange}
+            convFilters={convFilters}
+            selectedConvFilterIndex={selectedConvFilterIndex}
+            onConvFilterIndexChange={this.onConvFilterIndexChange}
+            onConvFilterMatrixChange={this.onConvFilterMatrixChange}
+            poolFilterSize={poolFilterSize}
+            onPoolFilterSizeChange={this.onPoolFilterSizeChange}
+            poolStride={poolStride}
+            onPoolStrideChange={this.onPoolStrideChange}
+          />
         </div>
-        <Controls
-          selectedInputType={selectedInputType}
-          onInputTypeChange={this.onInputTypeChange}
-          selectedLayerType={selectedLayerType}
-          onLayerTypeChange={this.onLayerTypeChange}
-          convStride={convStride}
-          onConvStrideChange={this.onConvStrideChange}
-          convFilters={convFilters}
-          selectedConvFilterIndex={selectedConvFilterIndex}
-          onConvFilterIndexChange={this.onConvFilterIndexChange}
-          onConvFilterMatrixChange={this.onConvFilterMatrixChange}
-          poolFilterSize={poolFilterSize}
-          onPoolFilterSizeChange={this.onPoolFilterSizeChange}
-          poolStride={poolStride}
-          onPoolStrideChange={this.onPoolStrideChange}
-        />
-      </div>
+        <style jsx global>{`
+          body {
+            margin: 0;
+          }
+        `}</style>
+        <style jsx>{`
+          .container {
+            padding: 10px;
+            background-color: #eee;
+          }
+          .inputAndOutputContainer {
+            display: flex;
+          }
+          .inputContainer {
+            align-self: flex-start;
+          }
+          .outputContainer {
+            align-self: flex-start;
+            margin-left: 20px;
+            transform: translateY(${MAX_PADDING * scale}px);
+          }
+        `}</style>
+      </Fragment>
     );
   }
 }

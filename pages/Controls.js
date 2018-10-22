@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import {
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
@@ -50,106 +51,116 @@ export default class Controls extends React.Component {
     } = this.props;
 
     return (
-      <div>
-        <div>
-          Input:
-          {Object.keys(INPUT_TYPES).map(inputType => (
-            <label key={inputType}>
-              <input
-                type="radio"
-                name="inputType"
-                value={inputType}
-                checked={inputType === selectedInputType}
-                onChange={this.onInputTypeChange}
-              />
-              {INPUT_TYPES_LABELS[inputType]}
-            </label>
-          ))}
-        </div>
-        <div>
-          Layer:
-          {Object.keys(LAYER_TYPES).map(layerType => (
-            <label key={layerType}>
-              <input
-                type="radio"
-                name="layerType"
-                value={layerType}
-                checked={layerType === selectedLayerType}
-                onChange={this.onLayerTypeChange}
-              />
-              {LAYER_TYPES_LABELS[layerType]}
-            </label>
-          ))}
-        </div>
-        {selectedLayerType === LAYER_TYPES.CONV && (
+      <Fragment>
+        <div className="container">
           <div>
-            Stride:
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={convStride}
-              onChange={this.onConvStrideChange}
-            />
-            {convStride}
-          </div>
-        )}
-        {selectedLayerType === LAYER_TYPES.POOL && (
-          <div>
-            Filter Size:
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={poolFilterSize}
-              onChange={this.onPoolFilterSizeChange}
-            />
-            {poolFilterSize}
-          </div>
-        )}
-        {selectedLayerType === LAYER_TYPES.POOL && (
-          <div>
-            Stride:
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={poolStride}
-              onChange={this.onPoolStrideChange}
-            />
-            {poolStride}
-          </div>
-        )}
-        {selectedLayerType === LAYER_TYPES.CONV && (
-          <div style={{ display: "flex" }}>
-            Filter:
-            {convFilters.map((convFilter, index) => (
-              <div style={{ marginLeft: index > 0 ? 50 : 0 }} key={index}>
-                <label>
-                  <input
-                    type="radio"
-                    name="convFilter"
-                    value={index}
-                    checked={index === selectedConvFilterIndex}
-                    onChange={this.onConvFilterIndexChange}
-                  />
-                  {convFilter.name}
-                </label>
-                <Matrix
-                  isEditable={convFilter.isEditable}
-                  rows={convFilter.filterSize}
-                  columns={convFilter.filterSize}
-                  data={convFilter.filter}
-                  errors={convFilter.errors}
-                  onChange={(data, errors) => {
-                    onConvFilterMatrixChange(index, data, errors);
-                  }}
+            Input:
+            {Object.keys(INPUT_TYPES).map(inputType => (
+              <label key={inputType}>
+                <input
+                  type="radio"
+                  name="inputType"
+                  value={inputType}
+                  checked={inputType === selectedInputType}
+                  onChange={this.onInputTypeChange}
                 />
-              </div>
+                {INPUT_TYPES_LABELS[inputType]}
+              </label>
             ))}
           </div>
-        )}
-      </div>
+          <div>
+            Layer:
+            {Object.keys(LAYER_TYPES).map(layerType => (
+              <label key={layerType}>
+                <input
+                  type="radio"
+                  name="layerType"
+                  value={layerType}
+                  checked={layerType === selectedLayerType}
+                  onChange={this.onLayerTypeChange}
+                />
+                {LAYER_TYPES_LABELS[layerType]}
+              </label>
+            ))}
+          </div>
+          {selectedLayerType === LAYER_TYPES.CONV && (
+            <div>
+              Stride:
+              <input
+                type="range"
+                min="1"
+                max={convFilters[selectedConvFilterIndex].filterSize}
+                value={convStride}
+                onChange={this.onConvStrideChange}
+              />
+              {convStride}
+            </div>
+          )}
+          {selectedLayerType === LAYER_TYPES.POOL && (
+            <div>
+              Filter Size:
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value={poolFilterSize}
+                onChange={this.onPoolFilterSizeChange}
+              />
+              {poolFilterSize}
+            </div>
+          )}
+          {selectedLayerType === LAYER_TYPES.POOL && (
+            <div>
+              Stride:
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value={poolStride}
+                onChange={this.onPoolStrideChange}
+              />
+              {poolStride}
+            </div>
+          )}
+          {selectedLayerType === LAYER_TYPES.CONV && (
+            <div className="filtersContainer">
+              Filter:
+              {convFilters.map((convFilter, index) => (
+                <div style={{ marginLeft: index > 0 ? 50 : 0 }} key={index}>
+                  <label>
+                    <input
+                      type="radio"
+                      name="convFilter"
+                      value={index}
+                      checked={index === selectedConvFilterIndex}
+                      onChange={this.onConvFilterIndexChange}
+                    />
+                    {convFilter.name}
+                  </label>
+                  <Matrix
+                    isEditable={convFilter.isEditable}
+                    rows={convFilter.filterSize}
+                    columns={convFilter.filterSize}
+                    data={convFilter.filter}
+                    errors={convFilter.errors}
+                    onChange={(data, errors) => {
+                      onConvFilterMatrixChange(index, data, errors);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <style jsx>{`
+          .container {
+            margin-top: 30px;
+          }
+          .filtersContainer {
+            display: flex;
+          }
+        `}</style>
+      </Fragment>
     );
   }
 }

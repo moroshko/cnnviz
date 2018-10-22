@@ -65,7 +65,7 @@ export default class Matrix extends React.Component {
             left: 4px;
             right: 4px;
             height: 2px;
-            background-color: #fff;
+            background-color: #eee;
           }
           .top {
             top: -2px;

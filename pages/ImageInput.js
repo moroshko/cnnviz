@@ -1,44 +1,103 @@
+import { Fragment } from "react";
+import { MAX_PADDING } from "../utils/constants";
+
 export default class ImageInput extends React.Component {
+  state = {
+    imageWidth: null,
+    imageHeight: null
+  };
+
   componentDidMount() {
     const { src } = this.props;
 
     this.image = new Image();
-    this.image.onload = this.update;
+    this.image.onload = () => {
+      this.setState(
+        {
+          imageWidth: this.image.naturalWidth,
+          imageHeight: this.image.naturalHeight
+        },
+        this.update
+      );
+    };
     this.image.src = src;
   }
 
   componentDidUpdate(prevProps) {
-    const { displayWidth, displayHeight, scale } = this.props;
+    const { displayWidth, displayHeight, padding, scale } = this.props;
 
     if (
       displayWidth !== prevProps.displayWidth ||
       displayHeight !== prevProps.displayHeight ||
+      padding !== prevProps.padding ||
       scale !== prevProps.scale
     ) {
       this.update();
     }
   }
 
-  update = () => {
-    const { displayWidth, displayHeight, onUpdate } = this.props;
-    const {
-      width: dataWidth,
-      height: dataHeight
-    } = this.dataCanvasContext.canvas;
+  getInputData() {
+    if (!this.dataCanvasContext) {
+      return {
+        inputWidth: null,
+        inputHeight: null,
+        inputData: null
+      };
+    }
 
-    this.dataCanvasContext.drawImage(this.image, 0, 0, dataWidth, dataHeight);
+    const {
+      width: inputWidth,
+      height: inputHeight
+    } = this.dataCanvasContext.canvas;
+    const { data: inputData } = this.dataCanvasContext.getImageData(
+      0,
+      0,
+      inputWidth,
+      inputHeight
+    );
+
+    return {
+      inputWidth,
+      inputHeight,
+      inputData
+    };
+  }
+
+  update = () => {
+    const {
+      displayWidth,
+      displayHeight,
+      padding,
+      scale,
+      onUpdate
+    } = this.props;
+    const { imageWidth, imageHeight } = this.state;
+
+    if (imageWidth === null || imageHeight === null) {
+      return;
+    }
+
+    const twicePadding = padding << 1;
+
+    this.dataCanvasContext.drawImage(
+      this.image,
+      padding,
+      padding,
+      imageWidth,
+      imageHeight
+    );
 
     this.displayCanvasContext.imageSmoothingEnabled = false;
     this.displayCanvasContext.drawImage(
       this.image,
       0,
       0,
-      dataWidth,
-      dataHeight,
-      0,
-      0,
-      displayWidth,
-      displayHeight
+      imageWidth,
+      imageHeight,
+      padding * scale,
+      padding * scale,
+      displayWidth - scale * twicePadding,
+      displayHeight - scale * twicePadding
     );
 
     onUpdate();
@@ -60,45 +119,55 @@ export default class ImageInput extends React.Component {
     }
   };
 
-  getInputData() {
-    const {
-      width: dataWidth,
-      height: dataHeight
-    } = this.dataCanvasContext.canvas;
-
-    return this.dataCanvasContext.getImageData(0, 0, dataWidth, dataHeight)
-      .data;
-  }
-
   render() {
-    const { displayWidth, displayHeight, scale } = this.props;
+    const { displayWidth, displayHeight, padding, scale } = this.props;
+    const { imageWidth, imageHeight } = this.state;
+    const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
+    const containerWhitespace = displayCanvasTranslate << 1;
 
     return (
-      <div>
-        <canvas
-          className="dataCanvas"
-          width={displayWidth / scale}
-          height={displayHeight / scale}
-          ref={this.dataCanvasRef}
-        />
-        <canvas
-          width={displayWidth}
-          height={displayHeight}
-          ref={this.displayCanvasRef}
-        />
+      <Fragment>
+        <div className="container">
+          <canvas
+            className="dataCanvas"
+            width={displayWidth / scale}
+            height={displayHeight / scale}
+            ref={this.dataCanvasRef}
+          />
+          <canvas
+            className="displayCanvas"
+            width={displayWidth}
+            height={displayHeight}
+            ref={this.displayCanvasRef}
+          />
+        </div>
         <div className="dimensions">
-          {displayWidth} × {displayHeight}
+          {imageWidth !== null &&
+            imageHeight !== null &&
+            `${imageWidth} × ${imageHeight}${
+              padding === 0 ? "" : ` (+ Padding = ${padding})`
+            }`}
         </div>
         <style jsx>{`
+          .container {
+            width: ${displayWidth + containerWhitespace}px;
+            height: ${displayHeight + containerWhitespace}px;
+          }
           .dataCanvas {
             display: none;
           }
+          .displayCanvas {
+            transform: translate(
+              ${displayCanvasTranslate}px,
+              ${displayCanvasTranslate}px
+            );
+          }
           .dimensions {
             font-size: 12px;
-            text-align: right;
+            padding-left: ${MAX_PADDING * scale}px;
           }
         `}</style>
-      </div>
+      </Fragment>
     );
   }
 }
