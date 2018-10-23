@@ -1,5 +1,5 @@
 const { LAYER_TYPES } = require("./constants");
-const { getOutputDimensions, addPadding } = require("./shared");
+const { getOutputDimensions, addPadding, mapToPixels } = require("./shared");
 
 describe("getOutputDimensions", () => {
   it("filterSize = 3, padding = 0, stride = 1", () => {
@@ -109,5 +109,27 @@ describe("addPadding", () => {
         0, 0, 0, 0,    0, 0, 0, 0,      0,   0,   0,   0,      0,   0,   0,   0,      0,   0,   0,   0,      0,   0,   0,   0,    0, 0, 0, 0,    0, 0, 0, 0
       ])
     });
+  });
+});
+
+describe("mapToPixels", () => {
+  it("maps RGB values to [0..255] and sets alpha to 255", () => {
+    expect(
+      mapToPixels({
+        // prettier-ignore
+        dataArray: [
+          -45.75, 83.03, -36.74, 124,     42.49,  -1.81, -2.25,  2,    -21.92, -27.44, 43.77,  90,
+           23.27, 95.73, -64.32,  39,    -43.60, -50.80, 59.06, 15,    -91.37,  45.92, 21.61, 121
+        ],
+        minValues: [-91.37, -50.8, -64.32],
+        maxValues: [42.49, 95.73, 59.06]
+      })
+    ).toEqual(
+      // prettier-ignore
+      new Uint8ClampedArray([
+         87, 233, 57, 255,    255, 85, 128, 255,    132,  41, 223, 255,
+        218, 255,  0, 255,     91,  0, 255, 255,      0, 168, 178, 255
+      ])
+    );
   });
 });

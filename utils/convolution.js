@@ -1,3 +1,5 @@
+const { mapToPixels } = require("./shared");
+
 function convolutionStep({
   inputWidth,
   inputData,
@@ -129,40 +131,12 @@ function convolve({
     }
   }
 
-  // Normalize
-  const multipliers = [
-    255 / (maxValues[0] - minValues[0]),
-    255 / (maxValues[1] - minValues[1]),
-    255 / (maxValues[2] - minValues[2])
-  ];
-  const outputData = new Uint8ClampedArray(outputSize);
-
-  for (let channel = 0; channel < 3; channel++) {
-    for (
-      let outputIndex = channel, len = outputArray.length;
-      outputIndex < len;
-      outputIndex += 4
-    ) {
-      // (x + 0.5) | 0 is a faster version of Math.round(x)
-      outputData[outputIndex] =
-        ((outputArray[outputIndex] - minValues[channel]) *
-          multipliers[channel] +
-          0.5) |
-        0;
-    }
-  }
-
-  // set alpha channel
-  for (
-    let outputIndex = 3, len = outputArray.length;
-    outputIndex < len;
-    outputIndex += 4
-  ) {
-    outputData[outputIndex] = 255;
-  }
-
   return {
-    outputData
+    outputData: mapToPixels({
+      dataArray: outputArray,
+      minValues,
+      maxValues
+    })
   };
 }
 
