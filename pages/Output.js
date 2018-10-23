@@ -1,4 +1,5 @@
 import { MAX_PADDING } from "../utils/constants";
+import Dimensions from "./Dimensions";
 
 export default class Output extends React.Component {
   dataCanvasRef = canvas => {
@@ -60,15 +61,14 @@ export default class Output extends React.Component {
           ref={this.displayCanvasRef}
         />
         <div className="dimensions">
-          {dataWidth} × {dataHeight}
+          <Dimensions width={dataWidth} height={dataHeight} />
         </div>
         <style jsx>{`
           .dataCanvas {
             display: none;
           }
           .dimensions {
-            font-size: 12px;
-            transform: translateY(${MAX_PADDING * scale}px);
+            margin-top: ${MAX_PADDING * scale}px;
           }
         `}</style>
       </div>

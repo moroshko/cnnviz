@@ -141,13 +141,6 @@ export default class ImageInput extends React.Component {
             ref={this.displayCanvasRef}
           />
         </div>
-        <div className="dimensions">
-          {imageWidth !== null &&
-            imageHeight !== null &&
-            `${imageWidth} × ${imageHeight}${
-              padding === 0 ? "" : ` (+ Padding = ${padding})`
-            }`}
-        </div>
         <style jsx>{`
           .container {
             width: ${displayWidth + containerWhitespace}px;
@@ -161,10 +154,6 @@ export default class ImageInput extends React.Component {
               ${displayCanvasTranslate}px,
               ${displayCanvasTranslate}px
             );
-          }
-          .dimensions {
-            font-size: 12px;
-            padding-left: ${MAX_PADDING * scale}px;
           }
         `}</style>
       </Fragment>

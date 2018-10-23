@@ -98,7 +98,6 @@ export default class CameraInput extends React.Component {
 
   render() {
     const { displayWidth, displayHeight, padding, scale } = this.props;
-    const twicePadding = padding << 1;
     const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
     const containerWhitespace = displayCanvasTranslate << 1;
 
@@ -112,16 +111,10 @@ export default class CameraInput extends React.Component {
             ref={this.displayCanvasRef}
           />
           <video
-            width={displayWidth - scale * twicePadding}
-            height={displayHeight - scale * twicePadding}
+            width={displayWidth - scale * (padding << 1)}
+            height={displayHeight - scale * (padding << 1)}
             ref={this.videoRef}
           />
-        </div>
-        <div className="dimensions">
-          {`${displayWidth - scale * twicePadding} × ${displayHeight -
-            scale * twicePadding}${
-            padding === 0 ? "" : ` (+ Padding = ${padding})`
-          }`}
         </div>
         <style jsx>{`
           .container {
@@ -136,10 +129,6 @@ export default class CameraInput extends React.Component {
           }
           video {
             display: none;
-          }
-          .dimensions {
-            font-size: 12px;
-            padding-left: ${MAX_PADDING * scale}px;
           }
         `}</style>
       </Fragment>

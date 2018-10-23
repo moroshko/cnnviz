@@ -1,6 +1,7 @@
-import { INPUT_TYPES } from "../utils/constants";
+import { INPUT_TYPES, MAX_PADDING } from "../utils/constants";
 import ImageInput from "./ImageInput";
 import CameraInput from "./CameraInput";
+import Dimensions from "./Dimensions";
 
 export default class Input extends React.Component {
   inputRef = input => {
@@ -23,10 +24,11 @@ export default class Input extends React.Component {
       inputImage,
       onUpdate
     } = this.props;
+    let inputComponent;
 
     switch (inputType) {
       case INPUT_TYPES.IMAGE: {
-        return (
+        inputComponent = (
           <ImageInput
             displayWidth={displayWidth}
             displayHeight={displayHeight}
@@ -37,10 +39,11 @@ export default class Input extends React.Component {
             ref={this.inputRef}
           />
         );
+        break;
       }
 
       case INPUT_TYPES.CAMERA: {
-        return (
+        inputComponent = (
           <CameraInput
             displayWidth={displayWidth}
             displayHeight={displayHeight}
@@ -50,7 +53,26 @@ export default class Input extends React.Component {
             ref={this.inputRef}
           />
         );
+        break;
       }
     }
+
+    return (
+      <div>
+        {inputComponent}
+        <div className="dimensions">
+          <Dimensions
+            width={displayWidth / scale - (padding << 1)}
+            height={displayHeight / scale - (padding << 1)}
+            padding={padding}
+          />
+        </div>
+        <style jsx>{`
+          .dimensions {
+            margin-left: ${MAX_PADDING * scale}px;
+          }
+        `}</style>
+      </div>
+    );
   }
 }
