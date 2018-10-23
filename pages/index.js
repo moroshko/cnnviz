@@ -78,8 +78,8 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      inputType: INPUT_TYPES.IMAGE,
-      inputImage: IMAGES[1],
+      inputType: INPUT_TYPES.CAMERA,
+      inputImage: IMAGES[0],
       layerType: LAYER_TYPES.CONV,
       convFilters: INITIAL_CONV_FILTERS,
       convFilterIndex: 3,

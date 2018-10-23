@@ -2,14 +2,6 @@ import { MAX_PADDING } from "../utils/constants";
 import Dimensions from "./Dimensions";
 
 export default class Output extends React.Component {
-  dataCanvasRef = canvas => {
-    if (canvas !== null) {
-      this.dataCanvasContext = canvas.getContext("2d", {
-        alpha: false
-      });
-    }
-  };
-
   displayCanvasRef = canvas => {
     if (canvas !== null) {
       this.displayCanvasContext = canvas.getContext("2d", {
@@ -20,13 +12,7 @@ export default class Output extends React.Component {
 
   update(data) {
     const { dataWidth, dataHeight, scale } = this.props;
-    const imageData = new ImageData(
-      new Uint8ClampedArray(data),
-      dataWidth,
-      dataHeight
-    );
-
-    this.dataCanvasContext.putImageData(imageData, 0, 0);
+    const imageData = new ImageData(data, dataWidth, dataHeight);
 
     createImageBitmap(imageData).then(imageBitmap => {
       this.displayCanvasContext.imageSmoothingEnabled = false;
@@ -50,12 +36,6 @@ export default class Output extends React.Component {
     return (
       <div>
         <canvas
-          className="dataCanvas"
-          width={dataWidth}
-          height={dataHeight}
-          ref={this.dataCanvasRef}
-        />
-        <canvas
           width={dataWidth * scale}
           height={dataHeight * scale}
           ref={this.displayCanvasRef}
@@ -64,9 +44,6 @@ export default class Output extends React.Component {
           <Dimensions width={dataWidth} height={dataHeight} />
         </div>
         <style jsx>{`
-          .dataCanvas {
-            display: none;
-          }
           .dimensions {
             margin-top: ${MAX_PADDING * scale}px;
           }

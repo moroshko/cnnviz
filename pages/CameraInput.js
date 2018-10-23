@@ -22,7 +22,7 @@ export default class CameraInput extends React.Component {
   }
 
   getData() {
-    if (!this.displayCanvasContext) {
+    if (!this.dataCanvasContext) {
       return {
         inputWidth: null,
         inputHeight: null,
@@ -33,8 +33,8 @@ export default class CameraInput extends React.Component {
     const {
       width: inputWidth,
       height: inputHeight
-    } = this.displayCanvasContext.canvas;
-    const { data: inputData } = this.displayCanvasContext.getImageData(
+    } = this.dataCanvasContext.canvas;
+    const { data: inputData } = this.dataCanvasContext.getImageData(
       0,
       0,
       inputWidth,
@@ -49,24 +49,45 @@ export default class CameraInput extends React.Component {
   }
 
   update = () => {
-    const { padding, onUpdate } = this.props;
+    const { displayWidth, displayHeight, padding, onUpdate } = this.props;
+
+    if (!this.video) {
+      return;
+    }
 
     /*
       The transformation matrix is restored to identity matrix whenever canvas
       dimensions change. Instead of tracking this change, we just set the
       transformation matrix every time before drawing.
-      The matrix below performs a horizontal flip of the image.
+      The matrix below performs a horizontal flip.
     */
     // prettier-ignore
-    this.displayCanvasContext.setTransform(-1, 0, 0, 1, this.displayCanvasContext.canvas.width, 0);
-
-    this.displayCanvasContext.drawImage(
+    this.dataCanvasContext.setTransform(-1, 0, 0, 1, this.dataCanvasContext.canvas.width, 0);
+    this.dataCanvasContext.drawImage(
       this.video,
       padding,
       padding,
       this.video.width,
       this.video.height
     );
+
+    const { inputData, inputWidth, inputHeight } = this.getData();
+    const imageData = new ImageData(inputData, inputWidth, inputHeight);
+
+    createImageBitmap(imageData).then(imageBitmap => {
+      this.displayCanvasContext.imageSmoothingEnabled = false;
+      this.displayCanvasContext.drawImage(
+        imageBitmap,
+        0,
+        0,
+        inputWidth,
+        inputHeight,
+        0,
+        0,
+        displayWidth,
+        displayHeight
+      );
+    });
 
     onUpdate();
 
@@ -81,6 +102,14 @@ export default class CameraInput extends React.Component {
       this.stream.getTracks().forEach(track => track.stop());
     }
   }
+
+  dataCanvasRef = canvas => {
+    if (canvas !== null) {
+      this.dataCanvasContext = canvas.getContext("2d", {
+        alpha: false
+      });
+    }
+  };
 
   displayCanvasRef = canvas => {
     if (canvas !== null) {
@@ -105,6 +134,12 @@ export default class CameraInput extends React.Component {
       <Fragment>
         <div className="container">
           <canvas
+            className="dataCanvas"
+            width={displayWidth / scale}
+            height={displayHeight / scale}
+            ref={this.dataCanvasRef}
+          />
+          <canvas
             className="displayCanvas"
             width={displayWidth / scale}
             height={displayHeight / scale}
@@ -120,6 +155,9 @@ export default class CameraInput extends React.Component {
           .container {
             width: ${displayWidth + containerWhitespace}px;
             height: ${displayHeight + containerWhitespace}px;
+          }
+          .dataCanvas {
+            display: none;
           }
           .displayCanvas {
             transform: translate(

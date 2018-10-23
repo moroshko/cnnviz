@@ -64,13 +64,7 @@ export default class ImageInput extends React.Component {
   }
 
   update = () => {
-    const {
-      displayWidth,
-      displayHeight,
-      padding,
-      scale,
-      onUpdate
-    } = this.props;
+    const { displayWidth, displayHeight, padding, onUpdate } = this.props;
     const { imageWidth, imageHeight } = this.state;
 
     if (imageWidth === null || imageHeight === null) {
@@ -85,18 +79,23 @@ export default class ImageInput extends React.Component {
       imageHeight
     );
 
-    this.displayCanvasContext.imageSmoothingEnabled = false;
-    this.displayCanvasContext.drawImage(
-      this.image,
-      0,
-      0,
-      imageWidth,
-      imageHeight,
-      padding * scale,
-      padding * scale,
-      displayWidth - scale * (padding << 1),
-      displayHeight - scale * (padding << 1)
-    );
+    const { inputData, inputWidth, inputHeight } = this.getData();
+    const imageData = new ImageData(inputData, inputWidth, inputHeight);
+
+    createImageBitmap(imageData).then(imageBitmap => {
+      this.displayCanvasContext.imageSmoothingEnabled = false;
+      this.displayCanvasContext.drawImage(
+        imageBitmap,
+        0,
+        0,
+        inputWidth,
+        inputHeight,
+        0,
+        0,
+        displayWidth,
+        displayHeight
+      );
+    });
 
     onUpdate();
   };
