@@ -36,7 +36,7 @@ export default class ImageInput extends React.Component {
     }
   }
 
-  getInputData() {
+  getData() {
     if (!this.dataCanvasContext) {
       return {
         inputWidth: null,

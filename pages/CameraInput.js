@@ -21,7 +21,7 @@ export default class CameraInput extends React.Component {
       .catch(console.error);
   }
 
-  getInputData() {
+  getData() {
     if (!this.displayCanvasContext) {
       return {
         inputWidth: null,

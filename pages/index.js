@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import isEqual from "lodash.isequal";
-import ImageInput from "./ImageInput";
-import CameraInput from "./CameraInput";
+import Input from "./Input";
 import Output from "./Output";
 import Controls from "./Controls";
 import { getOutputDimensions } from "../utils/shared";
@@ -201,7 +200,7 @@ export default class App extends React.Component {
   drawOutput = () => {
     const { outputDataWidth, outputDataHeight, layerType, scale } = this.state;
 
-    const { inputWidth, inputHeight, inputData } = this.input.getInputData();
+    const { inputWidth, inputHeight, inputData } = this.input.getData();
 
     if (inputData === null) {
       return;
@@ -387,27 +386,16 @@ export default class App extends React.Component {
         <div className="container">
           <div className="inputAndOutputContainer">
             <div className="inputContainer">
-              {inputType === INPUT_TYPES.IMAGE && (
-                <ImageInput
-                  displayWidth={displayWidth}
-                  displayHeight={displayHeight}
-                  padding={inputPadding}
-                  scale={scale}
-                  src={inputImage.src}
-                  onUpdate={this.drawOutput}
-                  ref={this.inputRef}
-                />
-              )}
-              {inputType === INPUT_TYPES.CAMERA && (
-                <CameraInput
-                  displayWidth={displayWidth}
-                  displayHeight={displayHeight}
-                  padding={inputPadding}
-                  scale={scale}
-                  onUpdate={this.drawOutput}
-                  ref={this.inputRef}
-                />
-              )}
+              <Input
+                inputType={inputType}
+                displayWidth={displayWidth}
+                displayHeight={displayHeight}
+                padding={inputPadding}
+                scale={scale}
+                inputImage={inputImage}
+                onUpdate={this.drawOutput}
+                ref={this.inputRef}
+              />
             </div>
             <div className="outputContainer">
               <Output
