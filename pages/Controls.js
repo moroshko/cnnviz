@@ -38,12 +38,12 @@ export default class Controls extends React.Component {
 
   render() {
     const {
-      selectedInputType,
-      selectedLayerType,
+      inputType,
+      layerType,
       convStride,
       onConvStrideChange,
       convFilters,
-      selectedConvFilterIndex,
+      convFilterIndex,
       onConvFilterMatrixChange,
       poolFilterSize,
       poolStride,
@@ -55,48 +55,48 @@ export default class Controls extends React.Component {
         <div className="container">
           <div>
             Input:
-            {Object.keys(INPUT_TYPES).map(inputType => (
-              <label key={inputType}>
+            {Object.keys(INPUT_TYPES).map(_inputType => (
+              <label key={_inputType}>
                 <input
                   type="radio"
                   name="inputType"
-                  value={inputType}
-                  checked={inputType === selectedInputType}
+                  value={_inputType}
+                  checked={_inputType === inputType}
                   onChange={this.onInputTypeChange}
                 />
-                {INPUT_TYPES_LABELS[inputType]}
+                {INPUT_TYPES_LABELS[_inputType]}
               </label>
             ))}
           </div>
           <div>
             Layer:
-            {Object.keys(LAYER_TYPES).map(layerType => (
-              <label key={layerType}>
+            {Object.keys(LAYER_TYPES).map(_layerType => (
+              <label key={_layerType}>
                 <input
                   type="radio"
                   name="layerType"
-                  value={layerType}
-                  checked={layerType === selectedLayerType}
+                  value={_layerType}
+                  checked={_layerType === layerType}
                   onChange={this.onLayerTypeChange}
                 />
-                {LAYER_TYPES_LABELS[layerType]}
+                {LAYER_TYPES_LABELS[_layerType]}
               </label>
             ))}
           </div>
-          {selectedLayerType === LAYER_TYPES.CONV && (
+          {layerType === LAYER_TYPES.CONV && (
             <div>
               Stride:
               <input
                 type="range"
                 min="1"
-                max={convFilters[selectedConvFilterIndex].filterSize}
+                max={convFilters[convFilterIndex].filterSize}
                 value={convStride}
                 onChange={this.onConvStrideChange}
               />
               {convStride}
             </div>
           )}
-          {selectedLayerType === LAYER_TYPES.POOL && (
+          {layerType === LAYER_TYPES.POOL && (
             <div>
               Filter Size:
               <input
@@ -109,7 +109,7 @@ export default class Controls extends React.Component {
               {poolFilterSize}
             </div>
           )}
-          {selectedLayerType === LAYER_TYPES.POOL && (
+          {layerType === LAYER_TYPES.POOL && (
             <div>
               Stride:
               <input
@@ -122,7 +122,7 @@ export default class Controls extends React.Component {
               {poolStride}
             </div>
           )}
-          {selectedLayerType === LAYER_TYPES.CONV && (
+          {layerType === LAYER_TYPES.CONV && (
             <div className="filtersContainer">
               Filter:
               {convFilters.map((convFilter, index) => (
@@ -132,7 +132,7 @@ export default class Controls extends React.Component {
                       type="radio"
                       name="convFilter"
                       value={index}
-                      checked={index === selectedConvFilterIndex}
+                      checked={index === convFilterIndex}
                       onChange={this.onConvFilterIndexChange}
                     />
                     {convFilter.name}
