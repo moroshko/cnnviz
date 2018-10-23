@@ -77,8 +77,6 @@ export default class ImageInput extends React.Component {
       return;
     }
 
-    const twicePadding = padding << 1;
-
     this.dataCanvasContext.drawImage(
       this.image,
       padding,
@@ -96,8 +94,8 @@ export default class ImageInput extends React.Component {
       imageHeight,
       padding * scale,
       padding * scale,
-      displayWidth - scale * twicePadding,
-      displayHeight - scale * twicePadding
+      displayWidth - scale * (padding << 1),
+      displayHeight - scale * (padding << 1)
     );
 
     onUpdate();
