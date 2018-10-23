@@ -141,8 +141,8 @@ export default class CameraInput extends React.Component {
           />
           <canvas
             className="displayCanvas"
-            width={displayWidth / scale}
-            height={displayHeight / scale}
+            width={displayWidth}
+            height={displayHeight}
             ref={this.displayCanvasRef}
           />
           <video
