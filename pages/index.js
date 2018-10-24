@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { StrictMode } from "react";
 import isEqual from "lodash.isequal";
 import Input from "./Input";
 import Output from "./Output";
@@ -406,7 +406,7 @@ export default class App extends React.Component {
     const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (inputPadding << 1);
 
     return (
-      <Fragment>
+      <StrictMode>
         <div className="container">
           <div className="inputAndOutputContainer">
             <div className="inputContainer">
@@ -478,7 +478,7 @@ export default class App extends React.Component {
             transform: translateY(${MAX_PADDING * scale}px);
           }
         `}</style>
-      </Fragment>
+      </StrictMode>
     );
   }
 }
