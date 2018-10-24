@@ -78,11 +78,14 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      inputType: INPUT_TYPES.CAMERA,
-      inputImage: IMAGES[0],
+      inputType: INPUT_TYPES.IMAGE,
+      inputImage: IMAGES[1],
+      hasRedChannel: true,
+      hasGreenChannel: true,
+      hasBlueChannel: true,
       layerType: LAYER_TYPES.CONV,
       convFilters: INITIAL_CONV_FILTERS,
-      convFilterIndex: 3,
+      convFilterIndex: 0,
       convStride: 1,
       poolFilterSize: 2,
       poolStride: 2
@@ -267,6 +270,24 @@ export default class App extends React.Component {
     });
   };
 
+  onHasRedChannelChange = hasRedChannel => {
+    this.setState({
+      hasRedChannel
+    });
+  };
+
+  onHasGreenChannelChange = hasGreenChannel => {
+    this.setState({
+      hasGreenChannel
+    });
+  };
+
+  onHasBlueChannelChange = hasBlueChannel => {
+    this.setState({
+      hasBlueChannel
+    });
+  };
+
   onLayerTypeChange = layerType => {
     this.setState({
       layerType
@@ -368,6 +389,9 @@ export default class App extends React.Component {
       outputDataHeight,
       inputType,
       inputImage,
+      hasRedChannel,
+      hasGreenChannel,
+      hasBlueChannel,
       layerType,
       convPadding,
       convStride,
@@ -393,6 +417,9 @@ export default class App extends React.Component {
                 padding={inputPadding}
                 scale={scale}
                 inputImage={inputImage}
+                hasRedChannel={hasRedChannel}
+                hasGreenChannel={hasGreenChannel}
+                hasBlueChannel={hasBlueChannel}
                 onUpdate={this.drawOutput}
                 ref={this.inputRef}
               />
@@ -409,6 +436,12 @@ export default class App extends React.Component {
           <Controls
             inputType={inputType}
             onInputTypeChange={this.onInputTypeChange}
+            hasRedChannel={hasRedChannel}
+            onHasRedChannelChange={this.onHasRedChannelChange}
+            hasGreenChannel={hasGreenChannel}
+            onHasGreenChannelChange={this.onHasGreenChannelChange}
+            hasBlueChannel={hasBlueChannel}
+            onHasBlueChannelChange={this.onHasBlueChannelChange}
             layerType={layerType}
             onLayerTypeChange={this.onLayerTypeChange}
             convStride={convStride}

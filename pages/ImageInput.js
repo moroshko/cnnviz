@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { MAX_PADDING } from "../utils/constants";
+import { filterChannels } from "../utils/shared";
 
 export default class ImageInput extends React.Component {
   state = {
@@ -24,13 +25,24 @@ export default class ImageInput extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { displayWidth, displayHeight, padding, scale } = this.props;
+    const {
+      displayWidth,
+      displayHeight,
+      padding,
+      scale,
+      hasRedChannel,
+      hasGreenChannel,
+      hasBlueChannel
+    } = this.props;
 
     if (
       displayWidth !== prevProps.displayWidth ||
       displayHeight !== prevProps.displayHeight ||
       padding !== prevProps.padding ||
-      scale !== prevProps.scale
+      scale !== prevProps.scale ||
+      hasRedChannel !== prevProps.hasRedChannel ||
+      hasGreenChannel !== prevProps.hasGreenChannel ||
+      hasBlueChannel !== prevProps.hasBlueChannel
     ) {
       this.update();
     }
@@ -45,16 +57,24 @@ export default class ImageInput extends React.Component {
       };
     }
 
+    const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
     const {
       width: inputWidth,
       height: inputHeight
     } = this.dataCanvasContext.canvas;
-    const { data: inputData } = this.dataCanvasContext.getImageData(
+    const { data: imageData } = this.dataCanvasContext.getImageData(
       0,
       0,
       inputWidth,
       inputHeight
     );
+    const inputData = filterChannels({
+      data: imageData,
+      r: hasRedChannel,
+      g: hasGreenChannel,
+      b: hasBlueChannel,
+      a: true
+    });
 
     return {
       inputWidth,

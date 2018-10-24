@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { MAX_PADDING } from "../utils/constants";
+import { filterChannels } from "../utils/shared";
 
 export default class CameraInput extends React.Component {
   componentDidMount() {
@@ -21,6 +22,27 @@ export default class CameraInput extends React.Component {
       .catch(console.error);
   }
 
+  componentDidUpdate(prevProps) {
+    const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
+
+    if (
+      hasRedChannel !== prevProps.hasRedChannel ||
+      hasGreenChannel !== prevProps.hasGreenChannel ||
+      hasBlueChannel !== prevProps.hasBlueChannel
+    ) {
+      this.update();
+    }
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.requestID);
+
+    if (this.stream != null) {
+      // stop the camera
+      this.stream.getTracks().forEach(track => track.stop());
+    }
+  }
+
   getData() {
     if (!this.dataCanvasContext) {
       return {
@@ -30,16 +52,24 @@ export default class CameraInput extends React.Component {
       };
     }
 
+    const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
     const {
       width: inputWidth,
       height: inputHeight
     } = this.dataCanvasContext.canvas;
-    const { data: inputData } = this.dataCanvasContext.getImageData(
+    const { data: imageData } = this.dataCanvasContext.getImageData(
       0,
       0,
       inputWidth,
       inputHeight
     );
+    const inputData = filterChannels({
+      data: imageData,
+      r: hasRedChannel,
+      g: hasGreenChannel,
+      b: hasBlueChannel,
+      a: true
+    });
 
     return {
       inputWidth,
@@ -93,15 +123,6 @@ export default class CameraInput extends React.Component {
 
     this.requestID = requestAnimationFrame(this.update);
   };
-
-  componentWillUnmount() {
-    cancelAnimationFrame(this.requestID);
-
-    if (this.stream != null) {
-      // stop the camera
-      this.stream.getTracks().forEach(track => track.stop());
-    }
-  }
 
   dataCanvasRef = canvas => {
     if (canvas !== null) {

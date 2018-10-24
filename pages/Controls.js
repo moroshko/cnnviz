@@ -12,6 +12,18 @@ export default class Controls extends React.Component {
     this.props.onInputTypeChange(event.target.value);
   };
 
+  onHasRedChannelChange = event => {
+    this.props.onHasRedChannelChange(event.target.checked);
+  };
+
+  onHasGreenChannelChange = event => {
+    this.props.onHasGreenChannelChange(event.target.checked);
+  };
+
+  onHasBlueChannelChange = event => {
+    this.props.onHasBlueChannelChange(event.target.checked);
+  };
+
   onLayerTypeChange = event => {
     this.props.onLayerTypeChange(event.target.value);
   };
@@ -39,6 +51,9 @@ export default class Controls extends React.Component {
   render() {
     const {
       inputType,
+      hasRedChannel,
+      hasGreenChannel,
+      hasBlueChannel,
       layerType,
       convStride,
       onConvStrideChange,
@@ -67,6 +82,33 @@ export default class Controls extends React.Component {
                 {INPUT_TYPES_LABELS[_inputType]}
               </label>
             ))}
+          </div>
+          <div>
+            Channels:
+            <label>
+              <input
+                type="checkbox"
+                checked={hasRedChannel}
+                onChange={this.onHasRedChannelChange}
+              />
+              Red
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={hasGreenChannel}
+                onChange={this.onHasGreenChannelChange}
+              />
+              Green
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={hasBlueChannel}
+                onChange={this.onHasBlueChannelChange}
+              />
+              Blue
+            </label>
           </div>
           <div>
             Layer:

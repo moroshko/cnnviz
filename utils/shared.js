@@ -68,8 +68,23 @@ function mapToPixels({ dataArray, minValues, maxValues }) {
   return result;
 }
 
+function filterChannels({ data, r, g, b, a }) {
+  const channels = (r << 3) | (g << 2) | (b << 1) | a;
+  const dataLength = data.length;
+  const result = new Uint8ClampedArray(dataLength);
+
+  for (let i = 0; i < dataLength; i++) {
+    if (((1 << ((3 - i) & 3)) & channels) > 0) {
+      result[i] = data[i];
+    }
+  }
+
+  return result;
+}
+
 module.exports = {
   getOutputDimensions,
   addPadding,
-  mapToPixels
+  mapToPixels,
+  filterChannels
 };
