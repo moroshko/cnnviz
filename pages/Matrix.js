@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import range from "lodash.range";
 
 export default class Matrix extends React.Component {
   getDataIndex(row, column) {
@@ -22,9 +21,9 @@ export default class Matrix extends React.Component {
           <div className="bottom border" />
           <table>
             <tbody>
-              {range(rows).map(row => (
+              {Array.from({ length: rows }, (_, row) => (
                 <tr key={row}>
-                  {range(columns).map(column => {
+                  {Array.from({ length: columns }, (_, column) => {
                     const dataIndex = this.getDataIndex(row, column);
 
                     return (
