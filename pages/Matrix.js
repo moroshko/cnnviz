@@ -35,7 +35,7 @@ export default class Matrix extends React.Component {
                           disabled={!isEditable}
                           value={data[dataIndex]}
                           onChange={event => {
-                            const value = parseFloat(event.target.value);
+                            const value = Number(event.target.value);
                             const newData = data.slice();
 
                             newData[dataIndex] = isNaN(value) ? "" : value;

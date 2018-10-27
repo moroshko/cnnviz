@@ -29,23 +29,23 @@ export default class Controls extends React.Component {
   };
 
   onConvStrideChange = event => {
-    this.props.onConvStrideChange(parseInt(event.target.value, 10));
+    this.props.onConvStrideChange(Number(event.target.value));
   };
 
   onConvFilterIndexChange = event => {
     const { onConvFilterIndexChange } = this.props;
 
-    onConvFilterIndexChange(parseInt(event.target.value, 10));
+    onConvFilterIndexChange(Number(event.target.value));
   };
 
   onPoolFilterSizeChange = event => {
     const { onPoolFilterSizeChange } = this.props;
 
-    onPoolFilterSizeChange(parseInt(event.target.value, 10));
+    onPoolFilterSizeChange(Number(event.target.value));
   };
 
   onPoolStrideChange = event => {
-    this.props.onPoolStrideChange(parseInt(event.target.value, 10));
+    this.props.onPoolStrideChange(Number(event.target.value));
   };
 
   render() {
