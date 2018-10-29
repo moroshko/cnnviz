@@ -137,10 +137,23 @@ function controlsReducer(state, action) {
   switch (action.type) {
     case "UPDATE_INPUT_TYPE": {
       const { inputType } = action;
+      const { inputImage } = state;
+      const newScale = getScale({ inputType, inputImage });
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / newScale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
+        ...getLayerSpecificParams(state)
+      });
 
       return {
         ...state,
-        inputType
+        inputType,
+        scale: newScale,
+        outputDataWidth,
+        outputDataHeight
       };
     }
 
@@ -160,18 +173,52 @@ function controlsReducer(state, action) {
 
     case "UPDATE_LAYER_TYPE": {
       const { layerType } = action;
+      const { scale } = state;
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+        ...getLayerSpecificParams({
+          ...state,
+          layerType
+        })
+      });
+
       return {
         ...state,
-        layerType
+        layerType,
+        outputDataWidth,
+        outputDataHeight
       };
     }
 
     case "UPDATE_CONV_STRIDE": {
       const { convStride } = action;
+      const { convFilters, convFilterIndex, scale } = state;
+      const newConvPadding = getConvPadding({
+        convFilters,
+        convFilterIndex,
+        convStride
+      });
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+        filterSize: convFilters[convFilterIndex].filterSize,
+        padding: newConvPadding,
+        stride: convStride
+      });
 
       return {
         ...state,
-        convStride
+        convStride,
+        convPadding: newConvPadding,
+        outputDataWidth,
+        outputDataHeight
       };
     }
 

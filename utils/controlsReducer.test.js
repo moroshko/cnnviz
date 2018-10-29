@@ -101,13 +101,28 @@ const testInitialState = {
 };
 
 describe("UPDATE_INPUT_TYPE", () => {
-  it("updates input type", () => {
+  it("updates input type and affected parameters", () => {
     expect(
-      controlsReducer(testInitialState, {
-        type: "UPDATE_INPUT_TYPE",
-        inputType: INPUT_TYPES.CAMERA
-      }).inputType
-    ).toBe(INPUT_TYPES.CAMERA);
+      controlsReducer(
+        {
+          ...testInitialState,
+          inputType: INPUT_TYPES.CAMERA,
+          inputImage: {
+            src: "some other src",
+            scale: 16
+          }
+        },
+        {
+          type: "UPDATE_INPUT_TYPE",
+          inputType: INPUT_TYPES.IMAGE
+        }
+      )
+    ).toMatchObject({
+      inputType: INPUT_TYPES.IMAGE,
+      scale: 16,
+      outputDataWidth: 32,
+      outputDataHeight: 24
+    });
   });
 });
 
@@ -145,24 +160,33 @@ describe("UPDATE_CHANNELS", () => {
 });
 
 describe("UPDATE_LAYER_TYPE", () => {
-  it("updates layer type", () => {
+  it("updates layer type and affected parameters", () => {
     expect(
       controlsReducer(testInitialState, {
         type: "UPDATE_LAYER_TYPE",
         layerType: LAYER_TYPES.POOL
-      }).layerType
-    ).toBe(LAYER_TYPES.POOL);
+      })
+    ).toMatchObject({
+      layerType: LAYER_TYPES.POOL,
+      outputDataWidth: 256,
+      outputDataHeight: 192
+    });
   });
 });
 
 describe("UPDATE_CONV_STRIDE", () => {
-  it("updates conv stride", () => {
+  it("updates conv stride and affected parameters", () => {
     expect(
       controlsReducer(testInitialState, {
         type: "UPDATE_CONV_STRIDE",
         convStride: 2
-      }).convStride
-    ).toBe(2);
+      })
+    ).toMatchObject({
+      convStride: 2,
+      convPadding: 0,
+      outputDataWidth: 255,
+      outputDataHeight: 191
+    });
   });
 });
 
@@ -317,7 +341,7 @@ describe("UPDATE_CONV_FILTER_MATRIX", () => {
 });
 
 describe("UPDATE_POOL_FILTER_SIZE", () => {
-  it("updates pool filter size", () => {
+  it("updates pool filter size and affected parameters", () => {
     expect(
       controlsReducer(
         {
@@ -338,7 +362,7 @@ describe("UPDATE_POOL_FILTER_SIZE", () => {
 });
 
 describe("UPDATE_POOL_STRIDE", () => {
-  it("updates pool stride", () => {
+  it("updates pool stride and affected parameters", () => {
     expect(
       controlsReducer(
         {
