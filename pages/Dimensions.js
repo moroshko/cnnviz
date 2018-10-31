@@ -1,21 +1,17 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 
-export default class Dimensions extends React.Component {
-  render() {
-    const { width, height, padding } = this.props;
+export default function Dimensions(props) {
+  const { width, height, padding } = props;
 
-    return (
-      <Fragment>
-        <div className="container">
-          {width} × {height}
-          {padding > 0 && ` (+ Padding = ${padding})`}
-        </div>
-        <style jsx>{`
-          .container {
-            font-size: 12px;
-          }
-        `}</style>
-      </Fragment>
-    );
-  }
+  return (
+    <div className="container">
+      {width} × {height}
+      {padding > 0 && ` (+ Padding = ${padding})`}
+      <style jsx>{`
+        .container {
+          font-size: 12px;
+        }
+      `}</style>
+    </div>
+  );
 }
