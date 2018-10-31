@@ -1,5 +1,5 @@
-const { addPadding, mapToPixels } = require("./shared");
-const { convolve } = require("./convolution");
+const { addPadding, mapToPixels } = require('./shared');
+const { convolve } = require('./convolution');
 
 // prettier-ignore
 const inputData = new Uint8ClampedArray([
@@ -19,8 +19,8 @@ const inputData = new Uint8ClampedArray([
   135   222    44    70         64    23   177   183        226   165   216   124
 */
 
-describe("convolve", () => {
-  it("filterSize = 3 with integer values", () => {
+describe('convolve', () => {
+  it('filterSize = 3 with integer values', () => {
     expect(
       convolve({
         inputWidth: 4,
@@ -35,7 +35,7 @@ describe("convolve", () => {
         ],
         stride: 1,
         outputWidth: 2,
-        outputHeight: 3
+        outputHeight: 3,
       })
     ).toEqual({
       /*
@@ -54,7 +54,7 @@ describe("convolve", () => {
     });
   });
 
-  it("filterSize = 2 with float values", () => {
+  it('filterSize = 2 with float values', () => {
     expect(
       convolve({
         inputWidth: 4,
@@ -68,7 +68,7 @@ describe("convolve", () => {
         ],
         stride: 1,
         outputWidth: 3,
-        outputHeight: 4
+        outputHeight: 4,
       })
     ).toEqual({
       // prettier-ignore
@@ -81,7 +81,7 @@ describe("convolve", () => {
     });
   });
 
-  it("filterSize = 3 with stride = 2", () => {
+  it('filterSize = 3 with stride = 2', () => {
     expect(
       convolve({
         inputWidth: 4,
@@ -96,7 +96,7 @@ describe("convolve", () => {
         ],
         stride: 2,
         outputWidth: 1,
-        outputHeight: 2
+        outputHeight: 2,
       })
     ).toEqual({
       /*
@@ -113,16 +113,16 @@ describe("convolve", () => {
     });
   });
 
-  it("identity filterSize = 7 with padding = 3", () => {
+  it('identity filterSize = 7 with padding = 3', () => {
     const {
       inputWidthWithPadding,
       inputHeightWithPadding,
-      inputDataWithPadding
+      inputDataWithPadding,
     } = addPadding({
       inputWidth: 4,
       inputHeight: 5,
       inputData,
-      padding: 3
+      padding: 3,
     });
 
     expect(
@@ -143,14 +143,14 @@ describe("convolve", () => {
         ],
         stride: 1,
         outputWidth: 4,
-        outputHeight: 5
+        outputHeight: 5,
       })
     ).toEqual({
       outputData: mapToPixels({
         dataArray: inputData,
         minValues: [17, 7, 15],
-        maxValues: [237, 238, 238]
-      })
+        maxValues: [237, 238, 238],
+      }),
     });
   });
 });

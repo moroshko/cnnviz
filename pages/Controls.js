@@ -1,11 +1,11 @@
-import { Fragment } from "react";
+import React, { Fragment } from 'react';
 import {
   INPUT_TYPES,
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
-  LAYER_TYPES_LABELS
-} from "../utils/constants";
-import Matrix from "./Matrix";
+  LAYER_TYPES_LABELS,
+} from '../utils/constants';
+import Matrix from './Matrix';
 
 export default class Controls extends React.Component {
   onInputTypeChange = event => {
@@ -56,13 +56,11 @@ export default class Controls extends React.Component {
       hasBlueChannel,
       layerType,
       convStride,
-      onConvStrideChange,
       convFilters,
       convFilterIndex,
       onConvFilterMatrixChange,
       poolFilterSize,
       poolStride,
-      onPoolStrideChange
     } = this.props;
 
     return (

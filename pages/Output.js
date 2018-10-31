@@ -1,11 +1,12 @@
-import { MAX_PADDING } from "../utils/constants";
-import Dimensions from "./Dimensions";
+import React from 'react';
+import { MAX_PADDING } from '../utils/constants';
+import Dimensions from './Dimensions';
 
 export default class Output extends React.Component {
   displayCanvasRef = canvas => {
     if (canvas !== null) {
-      this.displayCanvasContext = canvas.getContext("2d", {
-        alpha: false
+      this.displayCanvasContext = canvas.getContext('2d', {
+        alpha: false,
       });
     }
   };

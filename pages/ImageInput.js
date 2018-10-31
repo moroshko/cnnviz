@@ -1,11 +1,11 @@
-import { Fragment } from "react";
-import { MAX_PADDING } from "../utils/constants";
-import { filterChannels } from "../utils/shared";
+import React, { Fragment } from 'react';
+import { MAX_PADDING } from '../utils/constants';
+import { filterChannels } from '../utils/shared';
 
 export default class ImageInput extends React.Component {
   state = {
     imageWidth: null,
-    imageHeight: null
+    imageHeight: null,
   };
 
   componentDidMount() {
@@ -16,7 +16,7 @@ export default class ImageInput extends React.Component {
       this.setState(
         {
           imageWidth: this.image.naturalWidth,
-          imageHeight: this.image.naturalHeight
+          imageHeight: this.image.naturalHeight,
         },
         this.update
       );
@@ -32,7 +32,7 @@ export default class ImageInput extends React.Component {
       scale,
       hasRedChannel,
       hasGreenChannel,
-      hasBlueChannel
+      hasBlueChannel,
     } = this.props;
 
     if (
@@ -53,14 +53,14 @@ export default class ImageInput extends React.Component {
       return {
         inputWidth: null,
         inputHeight: null,
-        inputData: null
+        inputData: null,
       };
     }
 
     const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
     const {
       width: inputWidth,
-      height: inputHeight
+      height: inputHeight,
     } = this.dataCanvasContext.canvas;
     const { data: imageData } = this.dataCanvasContext.getImageData(
       0,
@@ -73,13 +73,13 @@ export default class ImageInput extends React.Component {
       r: hasRedChannel,
       g: hasGreenChannel,
       b: hasBlueChannel,
-      a: true
+      a: true,
     });
 
     return {
       inputWidth,
       inputHeight,
-      inputData
+      inputData,
     };
   }
 
@@ -122,23 +122,22 @@ export default class ImageInput extends React.Component {
 
   dataCanvasRef = canvas => {
     if (canvas !== null) {
-      this.dataCanvasContext = canvas.getContext("2d", {
-        alpha: false
+      this.dataCanvasContext = canvas.getContext('2d', {
+        alpha: false,
       });
     }
   };
 
   displayCanvasRef = canvas => {
     if (canvas !== null) {
-      this.displayCanvasContext = canvas.getContext("2d", {
-        alpha: false
+      this.displayCanvasContext = canvas.getContext('2d', {
+        alpha: false,
       });
     }
   };
 
   render() {
     const { displayWidth, displayHeight, padding, scale } = this.props;
-    const { imageWidth, imageHeight } = this.state;
     const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
     const containerWhitespace = displayCanvasTranslate << 1;
 

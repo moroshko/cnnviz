@@ -1,18 +1,16 @@
-const { LAYER_TYPES } = require("./constants");
-
 function getOutputDimensions({
   inputWidth,
   inputHeight,
   filterSize,
   padding,
-  stride
+  stride,
 }) {
   const twicePadding = padding << 1;
 
   return {
     // x << 0 is a faster version of Math.floor(x)
     outputWidth: ((inputWidth - filterSize + twicePadding) / stride + 1) << 0,
-    outputHeight: ((inputHeight - filterSize + twicePadding) / stride + 1) << 0
+    outputHeight: ((inputHeight - filterSize + twicePadding) / stride + 1) << 0,
   };
 }
 
@@ -39,7 +37,7 @@ function addPadding({ inputWidth, inputHeight, inputData, padding }) {
   return {
     inputWidthWithPadding,
     inputHeightWithPadding,
-    inputDataWithPadding
+    inputDataWithPadding,
   };
 }
 
@@ -48,7 +46,7 @@ function mapToPixels({ dataArray, minValues, maxValues }) {
   const multipliers = [
     255 / (maxValues[0] - minValues[0]),
     255 / (maxValues[1] - minValues[1]),
-    255 / (maxValues[2] - minValues[2])
+    255 / (maxValues[2] - minValues[2]),
   ];
   const result = new Uint8ClampedArray(dataArrayLength);
 
@@ -86,5 +84,5 @@ module.exports = {
   getOutputDimensions,
   addPadding,
   mapToPixels,
-  filterChannels
+  filterChannels,
 };

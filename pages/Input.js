@@ -1,8 +1,8 @@
-import { INPUT_TYPES, MAX_PADDING } from "../utils/constants";
-import { filterChannels } from "../utils/shared";
-import ImageInput from "./ImageInput";
-import CameraInput from "./CameraInput";
-import Dimensions from "./Dimensions";
+import React from 'react';
+import { INPUT_TYPES, MAX_PADDING } from '../utils/constants';
+import ImageInput from './ImageInput';
+import CameraInput from './CameraInput';
+import Dimensions from './Dimensions';
 
 export default class Input extends React.Component {
   inputRef = input => {
@@ -26,7 +26,7 @@ export default class Input extends React.Component {
       hasRedChannel,
       hasGreenChannel,
       hasBlueChannel,
-      onUpdate
+      onUpdate,
     } = this.props;
     let inputComponent;
 

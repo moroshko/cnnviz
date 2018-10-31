@@ -1,7 +1,7 @@
-import { StrictMode } from "react";
-import App from "./App";
+import React, { StrictMode } from 'react';
+import App from './App';
 
-export default () => {
+export default function CNNViz() {
   return (
     <StrictMode>
       <App />
@@ -12,4 +12,4 @@ export default () => {
       `}</style>
     </StrictMode>
   );
-};
+}

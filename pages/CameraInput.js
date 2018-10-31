@@ -1,6 +1,6 @@
-import { Fragment } from "react";
-import { MAX_PADDING } from "../utils/constants";
-import { filterChannels } from "../utils/shared";
+import React, { Fragment } from 'react';
+import { MAX_PADDING } from '../utils/constants';
+import { filterChannels } from '../utils/shared';
 
 export default class CameraInput extends React.Component {
   componentDidMount() {
@@ -9,7 +9,7 @@ export default class CameraInput extends React.Component {
     navigator.mediaDevices
       .getUserMedia({
         video: { displayWidth, displayHeight },
-        audio: false
+        audio: false,
       })
       .then(stream => {
         this.stream = stream;
@@ -19,7 +19,10 @@ export default class CameraInput extends React.Component {
 
         this.update();
       })
-      .catch(console.error);
+      .catch(error => {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      });
   }
 
   componentDidUpdate(prevProps) {
@@ -48,14 +51,14 @@ export default class CameraInput extends React.Component {
       return {
         inputWidth: null,
         inputHeight: null,
-        inputData: null
+        inputData: null,
       };
     }
 
     const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
     const {
       width: inputWidth,
-      height: inputHeight
+      height: inputHeight,
     } = this.dataCanvasContext.canvas;
     const { data: imageData } = this.dataCanvasContext.getImageData(
       0,
@@ -68,13 +71,13 @@ export default class CameraInput extends React.Component {
       r: hasRedChannel,
       g: hasGreenChannel,
       b: hasBlueChannel,
-      a: true
+      a: true,
     });
 
     return {
       inputWidth,
       inputHeight,
-      inputData
+      inputData,
     };
   }
 
@@ -126,16 +129,16 @@ export default class CameraInput extends React.Component {
 
   dataCanvasRef = canvas => {
     if (canvas !== null) {
-      this.dataCanvasContext = canvas.getContext("2d", {
-        alpha: false
+      this.dataCanvasContext = canvas.getContext('2d', {
+        alpha: false,
       });
     }
   };
 
   displayCanvasRef = canvas => {
     if (canvas !== null) {
-      this.displayCanvasContext = canvas.getContext("2d", {
-        alpha: false
+      this.displayCanvasContext = canvas.getContext('2d', {
+        alpha: false,
       });
     }
   };

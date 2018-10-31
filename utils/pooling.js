@@ -4,7 +4,7 @@ function poolStep({
   filterSize,
   topLeftIndex,
   inputDataIndexNextRowStep,
-  channel
+  channel,
 }) {
   const lastInputDataIndex =
     topLeftIndex + (((inputWidth + 1) * (filterSize - 1)) << 2);
@@ -32,12 +32,11 @@ function poolStep({
 
 function pool({
   inputWidth,
-  inputHeight,
   inputData,
   filterSize,
   stride,
   outputWidth,
-  outputHeight
+  outputHeight,
 }) {
   const outputSize = (outputWidth * outputHeight) << 2;
   const outputData = new Uint8ClampedArray(outputSize);
@@ -49,8 +48,6 @@ function pool({
   const inputDataIndexNextRowStep = (inputWidth - filterSize + 1) << 2;
   const lastTopLeftIndex =
     (inputWidth * ((outputHeight - 1) * stride + 1) - filterSize) << 2;
-  const filterSizeTimes4 = filterSize << 2;
-  const outputWidthTimes4 = outputWidth << 2;
   let topLeftIndex = 0;
   let outputDataIndex = 0;
 
@@ -62,7 +59,7 @@ function pool({
         filterSize,
         topLeftIndex,
         inputDataIndexNextRowStep,
-        channel
+        channel,
       });
     }
 
@@ -76,10 +73,10 @@ function pool({
   }
 
   return {
-    outputData
+    outputData,
   };
 }
 
 module.exports = {
-  pool
+  pool,
 };

@@ -1,60 +1,59 @@
-const { LAYER_TYPES } = require("./constants");
 const {
   getOutputDimensions,
   addPadding,
   mapToPixels,
-  filterChannels
-} = require("./shared");
+  filterChannels,
+} = require('./shared');
 
-describe("getOutputDimensions", () => {
-  it("filterSize = 3, padding = 0, stride = 1", () => {
+describe('getOutputDimensions', () => {
+  it('filterSize = 3, padding = 0, stride = 1', () => {
     expect(
       getOutputDimensions({
         inputWidth: 13,
         inputHeight: 8,
         filterSize: 3,
         padding: 0,
-        stride: 1
+        stride: 1,
       })
     ).toEqual({
       outputWidth: 11,
-      outputHeight: 6
+      outputHeight: 6,
     });
   });
 
-  it("filterSize = 3, padding = 0, stride = 2", () => {
+  it('filterSize = 3, padding = 0, stride = 2', () => {
     expect(
       getOutputDimensions({
         inputWidth: 13,
         inputHeight: 8,
         filterSize: 3,
         padding: 0,
-        stride: 2
+        stride: 2,
       })
     ).toEqual({
       outputWidth: 6,
-      outputHeight: 3
+      outputHeight: 3,
     });
   });
 
-  it("filterSize = 3, padding = 3, stride = 1", () => {
+  it('filterSize = 3, padding = 3, stride = 1', () => {
     expect(
       getOutputDimensions({
         inputWidth: 13,
         inputHeight: 8,
         filterSize: 3,
         padding: 3,
-        stride: 1
+        stride: 1,
       })
     ).toEqual({
       outputWidth: 17,
-      outputHeight: 12
+      outputHeight: 12,
     });
   });
 });
 
-describe("addPadding", () => {
-  it("padding = 0", () => {
+describe('addPadding', () => {
+  it('padding = 0', () => {
     expect(
       addPadding({
         inputWidth: 4,
@@ -67,7 +66,7 @@ describe("addPadding", () => {
           108,   7, 192,  43,    158,  26, 128, 201,    151,  90, 217,   3,     221, 168,  55, 155,
           135,  64, 226, 128,    222,  23, 165, 208,     44, 177, 216, 183,      70, 183, 124, 198,
         ]),
-        padding: 0
+        padding: 0,
       })
     ).toEqual({
       inputWidthWithPadding: 4,
@@ -83,7 +82,7 @@ describe("addPadding", () => {
     });
   });
 
-  it("padding = 2", () => {
+  it('padding = 2', () => {
     expect(
       addPadding({
         inputWidth: 4,
@@ -96,7 +95,7 @@ describe("addPadding", () => {
           108,   7, 192,  43,    158,  26, 128, 201,    151,  90, 217,   3,     221, 168,  55, 155,
           135,  64, 226, 128,    222,  23, 165, 208,     44, 177, 216, 183,      70, 183, 124, 198,
         ]),
-        padding: 2
+        padding: 2,
       })
     ).toEqual({
       inputWidthWithPadding: 8,
@@ -117,8 +116,8 @@ describe("addPadding", () => {
   });
 });
 
-describe("mapToPixels", () => {
-  it("maps RGB values to [0..255] and sets alpha to 255", () => {
+describe('mapToPixels', () => {
+  it('maps RGB values to [0..255] and sets alpha to 255', () => {
     expect(
       mapToPixels({
         // prettier-ignore
@@ -127,7 +126,7 @@ describe("mapToPixels", () => {
            23.27, 95.73, -64.32,  39,    -43.60, -50.80, 59.06, 15,    -91.37,  45.92, 21.61, 121
         ],
         minValues: [-91.37, -50.8, -64.32],
-        maxValues: [42.49, 95.73, 59.06]
+        maxValues: [42.49, 95.73, 59.06],
       })
     ).toEqual(
       // prettier-ignore
@@ -139,8 +138,8 @@ describe("mapToPixels", () => {
   });
 });
 
-describe("filterChannels", () => {
-  it("filters only the green channel", () => {
+describe('filterChannels', () => {
+  it('filters only the green channel', () => {
     expect(
       filterChannels({
         // prettier-ignore
@@ -154,7 +153,7 @@ describe("filterChannels", () => {
         r: false,
         g: true,
         b: false,
-        a: false
+        a: false,
       })
     ).toEqual(
       // prettier-ignore
@@ -168,7 +167,7 @@ describe("filterChannels", () => {
     );
   });
 
-  it("filters red, blue, and alpha channels", () => {
+  it('filters red, blue, and alpha channels', () => {
     expect(
       filterChannels({
         // prettier-ignore
@@ -182,7 +181,7 @@ describe("filterChannels", () => {
         r: true,
         g: false,
         b: true,
-        a: true
+        a: true,
       })
     ).toEqual(
       // prettier-ignore
@@ -196,7 +195,7 @@ describe("filterChannels", () => {
     );
   });
 
-  it("filters no channels", () => {
+  it('filters no channels', () => {
     expect(
       filterChannels({
         // prettier-ignore
@@ -210,7 +209,7 @@ describe("filterChannels", () => {
         r: false,
         g: false,
         b: false,
-        a: false
+        a: false,
       })
     ).toEqual(
       // prettier-ignore
@@ -224,7 +223,7 @@ describe("filterChannels", () => {
     );
   });
 
-  it("filters all channels", () => {
+  it('filters all channels', () => {
     expect(
       filterChannels({
         // prettier-ignore
@@ -238,7 +237,7 @@ describe("filterChannels", () => {
         r: true,
         g: true,
         b: true,
-        a: true
+        a: true,
       })
     ).toEqual(
       // prettier-ignore

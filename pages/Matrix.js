@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function Matrix(props) {
   const { isEditable, rows, columns, data, errors, onChange } = props;
@@ -17,7 +17,7 @@ export default function Matrix(props) {
                 return (
                   <td key={column}>
                     <input
-                      className={errors[dataIndex] && "withError"}
+                      className={errors[dataIndex] && 'withError'}
                       type="number"
                       step={0.1}
                       disabled={!isEditable}
@@ -26,10 +26,10 @@ export default function Matrix(props) {
                         const value = Number(event.target.value);
                         const newData = data.slice();
 
-                        newData[dataIndex] = isNaN(value) ? "" : value;
+                        newData[dataIndex] = isNaN(value) ? '' : value;
 
                         const newErrors = newData.map(
-                          value => typeof value !== "number"
+                          value => typeof value !== 'number'
                         );
 
                         onChange(newData, newErrors);

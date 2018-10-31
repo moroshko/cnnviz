@@ -1,20 +1,18 @@
-import { Fragment } from "react";
-import isEqual from "lodash.isequal";
-import Input from "./Input";
-import Output from "./Output";
-import Controls from "./Controls";
-import { getOutputDimensions } from "../utils/shared";
-import { convolve } from "../utils/convolution";
-import { pool } from "../utils/pooling";
+import React, { Fragment } from 'react';
+import isEqual from 'lodash.isequal';
+import Input from './Input';
+import Output from './Output';
+import Controls from './Controls';
+import { getOutputDimensions } from '../utils/shared';
+import { convolve } from '../utils/convolution';
+import { pool } from '../utils/pooling';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
   INPUT_TYPES,
-  INPUT_TYPES_LABELS,
   LAYER_TYPES,
-  LAYER_TYPES_LABELS,
-  MAX_PADDING
-} from "../utils/constants";
+  MAX_PADDING,
+} from '../utils/constants';
 
 // prettier-ignore
 const INITIAL_CONV_FILTERS = [
@@ -64,13 +62,13 @@ const INITIAL_CONV_FILTERS = [
 
 const IMAGES = [
   {
-    src: "/static/digit_4.jpg",
-    scale: 16
+    src: '/static/digit_4.jpg',
+    scale: 16,
   },
   {
-    src: "/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg",
-    scale: 1
-  }
+    src: '/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg',
+    scale: 1,
+  },
 ];
 
 export default class App extends React.Component {
@@ -88,7 +86,7 @@ export default class App extends React.Component {
       convFilterIndex: 0,
       convStride: 1,
       poolFilterSize: 2,
-      poolStride: 2
+      poolStride: 2,
     };
 
     this.state.convPadding = this.getConvPadding();
@@ -96,11 +94,11 @@ export default class App extends React.Component {
 
     const {
       outputWidth: outputDataWidth,
-      outputHeight: outputDataHeight
+      outputHeight: outputDataHeight,
     } = getOutputDimensions({
       inputWidth: INPUT_DISPLAY_WIDTH / this.state.scale,
       inputHeight: INPUT_DISPLAY_HEIGHT / this.state.scale,
-      ...this.getLayerSpecificParams(this.state)
+      ...this.getLayerSpecificParams(this.state),
     });
 
     this.state.outputDataWidth = outputDataWidth;
@@ -129,7 +127,7 @@ export default class App extends React.Component {
         return {
           filterSize: convFilters[convFilterIndex].filterSize,
           padding: convPadding,
-          stride: convStride
+          stride: convStride,
         };
       }
 
@@ -139,7 +137,7 @@ export default class App extends React.Component {
         return {
           filterSize: poolFilterSize,
           padding: 0,
-          stride: poolStride
+          stride: poolStride,
         };
       }
 
@@ -158,7 +156,7 @@ export default class App extends React.Component {
       convFilterIndex,
       convStride,
       poolFilterSize,
-      poolStride
+      poolStride,
     } = this.state;
 
     if (
@@ -178,14 +176,14 @@ export default class App extends React.Component {
       const newScale = this.getScale();
       const {
         outputWidth: outputDataWidth,
-        outputHeight: outputDataHeight
+        outputHeight: outputDataHeight,
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / newScale,
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
         ...this.getLayerSpecificParams({
           ...this.state,
-          convPadding: newConvPadding
-        })
+          convPadding: newConvPadding,
+        }),
       });
 
       this.setState(
@@ -193,7 +191,7 @@ export default class App extends React.Component {
           outputDataWidth,
           outputDataHeight,
           convPadding: newConvPadding,
-          scale: newScale
+          scale: newScale,
         },
         this.drawOutput
       );
@@ -201,7 +199,7 @@ export default class App extends React.Component {
   }
 
   drawOutput = () => {
-    const { outputDataWidth, outputDataHeight, layerType, scale } = this.state;
+    const { outputDataWidth, outputDataHeight, layerType } = this.state;
 
     const { inputWidth, inputHeight, inputData } = this.input.getData();
 
@@ -224,7 +222,7 @@ export default class App extends React.Component {
           filterSize,
           stride: convStride,
           outputWidth: outputDataWidth,
-          outputHeight: outputDataHeight
+          outputHeight: outputDataHeight,
         }));
         break;
       }
@@ -239,7 +237,7 @@ export default class App extends React.Component {
           filterSize: poolFilterSize,
           stride: poolStride,
           outputWidth: outputDataWidth,
-          outputHeight: outputDataHeight
+          outputHeight: outputDataHeight,
         }));
         break;
       }
@@ -266,37 +264,37 @@ export default class App extends React.Component {
 
   onInputTypeChange = inputType => {
     this.setState({
-      inputType
+      inputType,
     });
   };
 
   onHasRedChannelChange = hasRedChannel => {
     this.setState({
-      hasRedChannel
+      hasRedChannel,
     });
   };
 
   onHasGreenChannelChange = hasGreenChannel => {
     this.setState({
-      hasGreenChannel
+      hasGreenChannel,
     });
   };
 
   onHasBlueChannelChange = hasBlueChannel => {
     this.setState({
-      hasBlueChannel
+      hasBlueChannel,
     });
   };
 
   onLayerTypeChange = layerType => {
     this.setState({
-      layerType
+      layerType,
     });
   };
 
   onConvStrideChange = convStride => {
     this.setState({
-      convStride
+      convStride,
     });
   };
 
@@ -306,7 +304,7 @@ export default class App extends React.Component {
       convStride: Math.min(
         state.convStride,
         state.convFilters[convFilterIndex].filterSize
-      )
+      ),
     }));
   };
 
@@ -318,7 +316,7 @@ export default class App extends React.Component {
       convFilters[convFilterIndex] = {
         ...convFilters[convFilterIndex],
         filter,
-        errors
+        errors,
       };
 
       if (errors.some(error => error === true)) {
@@ -328,19 +326,19 @@ export default class App extends React.Component {
           convStride: Math.min(
             state.convStride,
             convFilters[convFilterIndex].filterSize
-          )
+          ),
         };
       }
 
       const {
         outputWidth: outputDataWidth,
-        outputHeight: outputDataHeight
+        outputHeight: outputDataHeight,
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
         filterSize,
         padding: state.convPadding,
-        stride: state.convStride
+        stride: state.convStride,
       });
 
       return {
@@ -351,7 +349,7 @@ export default class App extends React.Component {
           convFilters[convFilterIndex].filterSize
         ),
         outputDataWidth,
-        outputDataHeight
+        outputDataHeight,
       };
     });
   };
@@ -360,26 +358,26 @@ export default class App extends React.Component {
     this.setState(state => {
       const {
         outputWidth: outputDataWidth,
-        outputHeight: outputDataHeight
+        outputHeight: outputDataHeight,
       } = getOutputDimensions({
         inputWidth: INPUT_DISPLAY_WIDTH / state.scale,
         inputHeight: INPUT_DISPLAY_HEIGHT / state.scale,
         filterSize: poolFilterSize,
         padding: 0,
-        stride: state.poolStride
+        stride: state.poolStride,
       });
 
       return {
         poolFilterSize,
         outputDataWidth,
-        outputDataHeight
+        outputDataHeight,
       };
     });
   };
 
   onPoolStrideChange = poolStride => {
     this.setState({
-      poolStride
+      poolStride,
     });
   };
 
@@ -399,7 +397,7 @@ export default class App extends React.Component {
       convFilterIndex,
       poolFilterSize,
       poolStride,
-      scale
+      scale,
     } = this.state;
     const inputPadding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
     const displayWidth = INPUT_DISPLAY_WIDTH + scale * (inputPadding << 1);

@@ -1,10 +1,10 @@
-const { performance } = require("perf_hooks");
+const { performance } = require('perf_hooks');
 const {
   INPUT_DISPLAY_WIDTH,
-  INPUT_DISPLAY_HEIGHT
-} = require("../utils/constants");
-const { getOutputDimensions } = require("../utils/shared");
-const { convolve } = require("../utils/convolution");
+  INPUT_DISPLAY_HEIGHT,
+} = require('../utils/constants');
+const { getOutputDimensions } = require('../utils/shared');
+const { convolve } = require('../utils/convolution');
 
 const COUNT = 100;
 
@@ -46,7 +46,8 @@ strides.forEach(stride => {
     for (let k = 0; k < COUNT; k++) {
       const inputData = getRandomInputData();
       const startTime = performance.now();
-      const { outputData } = convolve({
+
+      convolve({
         inputWidth: INPUT_DISPLAY_WIDTH,
         inputHeight: INPUT_DISPLAY_HEIGHT,
         inputData,
@@ -58,9 +59,10 @@ strides.forEach(stride => {
           inputHeight: INPUT_DISPLAY_HEIGHT,
           filterSize,
           padding: 0,
-          stride
-        })
+          stride,
+        }),
       });
+
       const endTime = performance.now();
 
       totalTime += endTime - startTime;
@@ -68,6 +70,7 @@ strides.forEach(stride => {
 
     const averageTime = (totalTime / COUNT).toFixed(2);
 
+    // eslint-disable-next-line no-console
     console.log(
       `filterSize = ${filterSize}, stride = ${stride} ===> ${averageTime}ms`
     );

@@ -1,7 +1,7 @@
-const { pool } = require("./pooling");
+const { pool } = require('./pooling');
 
-describe("pool", () => {
-  it("filterSize = 2, stride = 2", () => {
+describe('pool', () => {
+  it('filterSize = 2, stride = 2', () => {
     expect(
       pool({
         inputWidth: 4,
@@ -26,7 +26,7 @@ describe("pool", () => {
         filterSize: 2,
         stride: 2,
         outputWidth: 2,
-        outputHeight: 2
+        outputHeight: 2,
       })
     ).toEqual({
       /*

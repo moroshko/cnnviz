@@ -1,4 +1,4 @@
-const { mapToPixels } = require("./shared");
+const { mapToPixels } = require('./shared');
 
 function convolutionStep({
   inputWidth,
@@ -9,7 +9,7 @@ function convolutionStep({
   inputDataIndexNextRowStep,
   channel,
   min,
-  max
+  max,
 }) {
   const lastInputDataIndex =
     topLeftIndex + (((inputWidth + 1) * (filterSize - 1)) << 2);
@@ -34,19 +34,18 @@ function convolutionStep({
   return {
     sum,
     min: sum < min ? sum : min,
-    max: sum > max ? sum : max
+    max: sum > max ? sum : max,
   };
 }
 
 function convolve({
   inputWidth,
-  inputHeight,
   inputData,
   filterSize,
   filter,
   stride,
   outputWidth,
-  outputHeight
+  outputHeight,
 }) {
   const outputSize = (outputWidth * outputHeight) << 2;
   const outputArray = new Array(outputSize);
@@ -58,19 +57,17 @@ function convolve({
   const inputDataIndexNextRowStep = (inputWidth - filterSize + 1) << 2;
   const lastTopLeftIndex =
     (inputWidth * ((outputHeight - 1) * stride + 1) - filterSize) << 2;
-  const filterSizeTimes4 = filterSize << 2;
-  const outputWidthTimes4 = outputWidth << 2;
   let topLeftIndex = 0;
   let outputArrayIndex = 0;
   const minValues = [
     Infinity, // red
     Infinity, // green
-    Infinity // blue
+    Infinity, // blue
   ];
   const maxValues = [
     -Infinity, // red
     -Infinity, // green
-    -Infinity // blue
+    -Infinity, // blue
   ];
 
   while (topLeftIndex <= lastTopLeftIndex) {
@@ -84,7 +81,7 @@ function convolve({
       inputDataIndexNextRowStep,
       channel: 0,
       min: minValues[0],
-      max: maxValues[0]
+      max: maxValues[0],
     });
     outputArray[outputArrayIndex++] = sum;
     minValues[0] = min;
@@ -100,7 +97,7 @@ function convolve({
       inputDataIndexNextRowStep,
       channel: 1,
       min: minValues[1],
-      max: maxValues[1]
+      max: maxValues[1],
     }));
     outputArray[outputArrayIndex++] = sum;
     minValues[1] = min;
@@ -116,7 +113,7 @@ function convolve({
       inputDataIndexNextRowStep,
       channel: 2,
       min: minValues[2],
-      max: maxValues[2]
+      max: maxValues[2],
     }));
     outputArray[outputArrayIndex++] = sum;
     minValues[2] = min;
@@ -135,11 +132,11 @@ function convolve({
     outputData: mapToPixels({
       dataArray: outputArray,
       minValues,
-      maxValues
-    })
+      maxValues,
+    }),
   };
 }
 
 module.exports = {
-  convolve
+  convolve,
 };
