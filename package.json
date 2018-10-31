@@ -18,10 +18,9 @@
     }
   },
   "lint-staged": {
-    "*.js": [
+    "**/*.js": "eslint --max-warnings 0",
+    "**/*.{js,json}": [
       "npm run prettier",
-      "npm run lint",
-      "npm test",
       "git add"
     ]
   },
