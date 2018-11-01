@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -135,6 +136,20 @@ initialControlsState.outputDataHeight = outputDataHeight;
 
 function controlsReducer(state, action) {
   switch (action.type) {
+    // temp
+    case 'UPDATE_INPUT_IMAGE': {
+      const newInputImage = IMAGES[0];
+
+      return {
+        ...state,
+        inputImage: newInputImage,
+        scale: getScale({
+          inputType: state.inputType,
+          inputImage: newInputImage,
+        }),
+      };
+    }
+
     case 'UPDATE_INPUT_TYPE': {
       const { inputType } = action;
       const { inputImage } = state;
@@ -340,4 +355,6 @@ function controlsReducer(state, action) {
   }
 }
 
-export { initialControlsState, controlsReducer };
+const ControlsContext = React.createContext(null);
+
+export { initialControlsState, controlsReducer, ControlsContext };

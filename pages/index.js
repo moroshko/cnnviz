@@ -1,10 +1,10 @@
 import React, { StrictMode } from 'react';
-import App from './App';
+import App2 from './App2';
 
-export default function CNNViz() {
+export default function Index() {
   return (
     <StrictMode>
-      <App />
+      <App2 />
       <style jsx global>{`
         body {
           margin: 0;
