@@ -21,15 +21,6 @@ export default function App2() {
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (inputPadding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (inputPadding << 1);
 
-  // temp
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     console.log('===== AFTER 2 seconds =====');
-  //
-  //     dispatchControlsChange({ type: 'UPDATE_INPUT_IMAGE' });
-  //   }, 2000);
-  // }, []);
-
   return (
     <ControlsContext.Provider value={{ controls, dispatchControlsChange }}>
       <div className="container">

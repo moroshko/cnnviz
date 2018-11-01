@@ -20,6 +20,18 @@ const LAYER_TYPES_LABELS = {
 };
 
 const MAX_PADDING = 3;
+const MAX_SCALE = 16;
+
+const IMAGES = [
+  {
+    src: '/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg',
+    scale: 1,
+  },
+  {
+    src: '/static/digit_4.jpg',
+    scale: MAX_SCALE,
+  },
+];
 
 module.exports = {
   INPUT_DISPLAY_WIDTH,
@@ -29,4 +41,6 @@ module.exports = {
   LAYER_TYPES,
   LAYER_TYPES_LABELS,
   MAX_PADDING,
+  MAX_SCALE,
+  IMAGES,
 };

@@ -4,19 +4,9 @@ import {
   INPUT_DISPLAY_HEIGHT,
   INPUT_TYPES,
   LAYER_TYPES,
+  IMAGES,
 } from './constants';
 import { getOutputDimensions } from './shared';
-
-const IMAGES = [
-  {
-    src: '/static/digit_4.jpg',
-    scale: 16,
-  },
-  {
-    src: '/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg',
-    scale: 1,
-  },
-];
 
 // prettier-ignore
 const INITIAL_CONV_FILTERS = [
@@ -107,7 +97,7 @@ function getLayerSpecificParams(state) {
 
 const initialControlsState = {
   inputType: INPUT_TYPES.IMAGE,
-  inputImage: IMAGES[1],
+  inputImage: IMAGES[0],
   hasRedChannel: true,
   hasGreenChannel: true,
   hasBlueChannel: true,
@@ -136,20 +126,6 @@ initialControlsState.outputDataHeight = outputDataHeight;
 
 function controlsReducer(state, action) {
   switch (action.type) {
-    // temp
-    case 'UPDATE_INPUT_IMAGE': {
-      const newInputImage = IMAGES[0];
-
-      return {
-        ...state,
-        inputImage: newInputImage,
-        scale: getScale({
-          inputType: state.inputType,
-          inputImage: newInputImage,
-        }),
-      };
-    }
-
     case 'UPDATE_INPUT_TYPE': {
       const { inputType } = action;
       const { inputImage } = state;
@@ -166,6 +142,29 @@ function controlsReducer(state, action) {
       return {
         ...state,
         inputType,
+        scale: newScale,
+        outputDataWidth,
+        outputDataHeight,
+      };
+    }
+
+    case 'UPDATE_INPUT_IMAGE': {
+      const { imageIndex } = action;
+      const { inputType } = state;
+      const newInputImage = IMAGES[imageIndex];
+      const newScale = getScale({ inputType, inputImage: newInputImage });
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight,
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / newScale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
+        ...getLayerSpecificParams(state),
+      });
+
+      return {
+        ...state,
+        inputImage: newInputImage,
         scale: newScale,
         outputDataWidth,
         outputDataHeight,

@@ -1,7 +1,44 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { ControlsContext } from '../utils/controlsReducer';
-import { MAX_PADDING } from '../utils/constants';
+import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { filterChannels } from '../utils/shared';
+
+function useImage(src) {
+  const [prevSrc, setPrevSrc] = useState(null);
+  const [{ image, width, height }, setState] = useState({
+    image: null,
+    width: null,
+    height: null,
+  });
+
+  if (src !== prevSrc) {
+    setPrevSrc(src);
+    setState({
+      image: null,
+      width: null,
+      height: null,
+    });
+  }
+
+  useEffect(
+    () => {
+      const image = new Image();
+
+      image.onload = () => {
+        setState({
+          image,
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
+      };
+
+      image.src = src;
+    },
+    [src]
+  );
+
+  return [image, width, height];
+}
 
 function useCanvas() {
   const [context, setContext] = useState(null);
@@ -28,42 +65,38 @@ export default function ImageInput2(props) {
     hasBlueChannel,
     scale,
   } = controls;
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const imageRef = useRef(null);
-  const image = imageRef.current;
-  //console.log('render', { src: inputImage.src, image, isImageLoaded });
+  const [image, imageWidth, imageHeight] = useImage(inputImage.src);
   const [dataCanvasRef, dataCanvasContext] = useCanvas();
   const [displayCanvasRef, displayCanvasContext] = useCanvas();
-  const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
+  const displayCanvasTranslate = MAX_PADDING * MAX_SCALE - padding * scale;
   const containerWhitespace = displayCanvasTranslate << 1;
 
   useEffect(() => {
     if (
-      !isImageLoaded ||
+      image === null ||
+      imageWidth === null ||
+      imageHeight === null ||
       dataCanvasContext === null ||
       displayCanvasContext === null
     ) {
       return;
     }
 
-    //console.log('update', image);
     dataCanvasContext.drawImage(
       image,
       padding,
       padding,
-      image.naturalWidth,
-      image.naturalHeight
+      imageWidth,
+      imageHeight
     );
 
     const { width: inputWidth, height: inputHeight } = dataCanvasRef.current;
-    //console.log({ inputWidth, inputHeight });
     const { data: imageData } = dataCanvasContext.getImageData(
       0,
       0,
       inputWidth,
       inputHeight
     );
-    //console.log(imageData);
     const inputData = filterChannels({
       data: imageData,
       r: hasRedChannel,
@@ -90,21 +123,8 @@ export default function ImageInput2(props) {
     );
   });
 
-  //console.log('rendering with src =', inputImage.src);
-
   return (
     <div className="container">
-      <img
-        src={inputImage.src}
-        onLoad={() => {
-          //console.log('yo');
-          setIsImageLoaded(true);
-        }}
-        onError={() => {
-          //console.log('Error:', error);
-        }}
-        ref={imageRef}
-      />
       <canvas
         className="dataCanvas"
         width={displayWidth / scale}
@@ -121,9 +141,6 @@ export default function ImageInput2(props) {
         .container {
           width: ${displayWidth + containerWhitespace}px;
           height: ${displayHeight + containerWhitespace}px;
-        }
-        img {
-          display: none;
         }
         .dataCanvas {
           display: none;
