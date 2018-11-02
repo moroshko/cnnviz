@@ -4,6 +4,7 @@ import {
   INPUT_TYPES_LABELS,
   LAYER_TYPES,
   LAYER_TYPES_LABELS,
+  IMAGES,
 } from '../utils/constants';
 import { ControlsContext } from '../utils/controlsReducer';
 import Matrix from './Matrix';
@@ -12,6 +13,7 @@ export default function Controls2() {
   const { controls, dispatchControlsChange } = useContext(ControlsContext);
   const {
     inputType,
+    inputImageIndex,
     hasRedChannel,
     hasGreenChannel,
     hasBlueChannel,
@@ -67,6 +69,25 @@ export default function Controls2() {
           </label>
         ))}
       </div>
+      {inputType === INPUT_TYPES.IMAGE && (
+        <div className="inputImagesContainer">
+          {IMAGES.map((image, index) => (
+            <label key={index}>
+              <input
+                type="radio"
+                name="inputImage"
+                value={index}
+                checked={index === inputImageIndex}
+                onChange={dispatchNumber(
+                  'UPDATE_INPUT_IMAGE',
+                  'inputImageIndex'
+                )}
+              />
+              {image.name}
+            </label>
+          ))}
+        </div>
+      )}
       <div>
         Channels:
         <label>
@@ -191,6 +212,9 @@ export default function Controls2() {
       <style jsx>{`
         .container {
           margin-top: 30px;
+        }
+        .inputImagesContainer {
+          padding-left: 38px;
         }
         .filtersContainer {
           display: flex;

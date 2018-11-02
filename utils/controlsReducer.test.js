@@ -1,4 +1,4 @@
-import { INPUT_TYPES, LAYER_TYPES, IMAGES } from './constants';
+import { INPUT_TYPES, LAYER_TYPES } from './constants';
 import { initialControlsState, controlsReducer } from './controlsReducer';
 
 function expectEnum(ENUM_OBJECT) {
@@ -11,10 +11,7 @@ it('initial state has the right shape', () => {
   expect(initialControlsState).toEqual(
     expect.objectContaining({
       inputType: expectEnum(INPUT_TYPES),
-      inputImage: expect.objectContaining({
-        src: expect.any(String),
-        scale: expect.any(Number),
-      }),
+      inputImageIndex: expect.any(Number),
       hasRedChannel: expect.any(Boolean),
       hasGreenChannel: expect.any(Boolean),
       hasBlueChannel: expect.any(Boolean),
@@ -42,7 +39,7 @@ it('initial state has the right shape', () => {
 
 const testInitialState = {
   inputType: INPUT_TYPES.IMAGE,
-  inputImage: IMAGES[0],
+  inputImageIndex: 0,
   hasRedChannel: true,
   hasGreenChannel: true,
   hasBlueChannel: true,
@@ -121,7 +118,7 @@ describe('UPDATE_INPUT_TYPE', () => {
         {
           ...testInitialState,
           inputType: INPUT_TYPES.CAMERA,
-          inputImage: IMAGES[1],
+          inputImageIndex: 1,
         },
         {
           type: 'UPDATE_INPUT_TYPE',
@@ -142,10 +139,10 @@ describe('UPDATE_INPUT_IMAGE', () => {
     expect(
       controlsReducer(testInitialState, {
         type: 'UPDATE_INPUT_IMAGE',
-        imageIndex: 1,
+        inputImageIndex: 1,
       })
     ).toMatchObject({
-      inputImage: IMAGES[1],
+      inputImageIndex: 1,
       scale: 16,
       outputDataWidth: 32,
       outputDataHeight: 24,

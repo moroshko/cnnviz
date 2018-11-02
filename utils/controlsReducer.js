@@ -60,8 +60,8 @@ function getConvPadding({ convFilters, convFilterIndex, convStride }) {
 }
 
 // TODO: Search for duplicates of this function
-function getScale({ inputType, inputImage }) {
-  return inputType === INPUT_TYPES.IMAGE ? inputImage.scale : 1;
+function getScale({ inputType, inputImageIndex }) {
+  return inputType === INPUT_TYPES.IMAGE ? IMAGES[inputImageIndex].scale : 1;
 }
 
 // TODO: Search for duplicates of this function
@@ -97,7 +97,7 @@ function getLayerSpecificParams(state) {
 
 const initialControlsState = {
   inputType: INPUT_TYPES.IMAGE,
-  inputImage: IMAGES[0],
+  inputImageIndex: 0,
   hasRedChannel: true,
   hasGreenChannel: true,
   hasBlueChannel: true,
@@ -128,8 +128,8 @@ function controlsReducer(state, action) {
   switch (action.type) {
     case 'UPDATE_INPUT_TYPE': {
       const { inputType } = action;
-      const { inputImage } = state;
-      const newScale = getScale({ inputType, inputImage });
+      const { inputImageIndex } = state;
+      const newScale = getScale({ inputType, inputImageIndex });
       const {
         outputWidth: outputDataWidth,
         outputHeight: outputDataHeight,
@@ -149,10 +149,12 @@ function controlsReducer(state, action) {
     }
 
     case 'UPDATE_INPUT_IMAGE': {
-      const { imageIndex } = action;
+      const { inputImageIndex } = action;
       const { inputType } = state;
-      const newInputImage = IMAGES[imageIndex];
-      const newScale = getScale({ inputType, inputImage: newInputImage });
+      const newScale = getScale({
+        inputType,
+        inputImageIndex,
+      });
       const {
         outputWidth: outputDataWidth,
         outputHeight: outputDataHeight,
@@ -164,7 +166,7 @@ function controlsReducer(state, action) {
 
       return {
         ...state,
-        inputImage: newInputImage,
+        inputImageIndex,
         scale: newScale,
         outputDataWidth,
         outputDataHeight,

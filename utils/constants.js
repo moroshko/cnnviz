@@ -24,10 +24,12 @@ const MAX_SCALE = 16;
 
 const IMAGES = [
   {
+    name: 'Nature',
     src: '/static/Valley-Of-Gods-Photo-By-John-B-Mueller.jpg',
     scale: 1,
   },
   {
+    name: 'Digit',
     src: '/static/digit_4.jpg',
     scale: MAX_SCALE,
   },
