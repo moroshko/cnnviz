@@ -186,8 +186,8 @@ function controlsReducer(state, action) {
     }
 
     case 'UPDATE_LAYER_TYPE': {
-      const { layerType } = action;
       const { scale } = state;
+      const { layerType } = action;
       const {
         outputWidth: outputDataWidth,
         outputHeight: outputDataHeight,
@@ -237,23 +237,41 @@ function controlsReducer(state, action) {
     }
 
     case 'UPDATE_CONV_FILTER_INDEX': {
-      const { convFilters, convStride } = state;
       const { convFilterIndex } = action;
+      const { convFilters, convStride, scale } = state;
       const newConvStride = Math.min(
         convStride,
         convFilters[convFilterIndex].filterSize
       );
+      const newConvPadding = getConvPadding({
+        convFilters,
+        convFilterIndex,
+        convStride: newConvStride,
+      });
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight,
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+        filterSize: convFilters[convFilterIndex].filterSize,
+        padding: newConvPadding,
+        stride: newConvStride,
+      });
 
       return {
         ...state,
         convFilterIndex,
         convStride: newConvStride,
+        convPadding: newConvPadding,
+        outputDataWidth,
+        outputDataHeight,
       };
     }
 
     case 'UPDATE_CONV_FILTER_MATRIX': {
-      const { convFilters } = state;
       const { convFilterIndex, filter, errors } = action;
+      const { convFilters } = state;
 
       if (!convFilters[convFilterIndex].isEditable) {
         return state;
@@ -297,6 +315,7 @@ function controlsReducer(state, action) {
       return {
         ...state,
         convFilters: newConvFilters,
+        convFilterIndex,
         convStride: newConvStride,
         convPadding: newConvPadding,
         outputDataWidth,

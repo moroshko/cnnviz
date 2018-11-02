@@ -49,7 +49,7 @@ const testInitialState = {
   layerType: LAYER_TYPES.CONV,
   convFilters: [
     {
-      name: '3x3 filter',
+      name: 'Not editable 3x3 filter',
       isEditable: false,
       // prettier-ignore
       filter: [
@@ -66,7 +66,7 @@ const testInitialState = {
       ]
     },
     {
-      name: '5x5 filter',
+      name: 'Editable 5x5 filter',
       isEditable: true,
       // prettier-ignore
       filter: [
@@ -84,6 +84,23 @@ const testInitialState = {
         false, false, false, false, false,
         false, false, false, false, false,
         false, false, false, false, false,
+      ]
+    },
+    {
+      name: 'Editable 3x3 filter',
+      isEditable: true,
+      // prettier-ignore
+      filter: [
+        -1, -2, -3,
+        -4, -5, -6,
+        -7, -8, -9
+      ],
+      filterSize: 3,
+      // prettier-ignore
+      errors: [
+        false, false, false,
+        false, false, false,
+        false, false, false
       ]
     },
   ],
@@ -201,7 +218,7 @@ describe('UPDATE_CONV_STRIDE', () => {
 });
 
 describe('UPDATE_CONV_FILTER_INDEX', () => {
-  it('updates conv filter index', () => {
+  it('updates conv filter index and affected parameters', () => {
     expect(
       controlsReducer(testInitialState, {
         type: 'UPDATE_CONV_FILTER_INDEX',
@@ -209,6 +226,9 @@ describe('UPDATE_CONV_FILTER_INDEX', () => {
       })
     ).toMatchObject({
       convFilterIndex: 1,
+      convPadding: 2,
+      outputDataWidth: 512,
+      outputDataHeight: 384,
     });
   });
 
@@ -298,7 +318,7 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
     });
   });
 
-  it('updates conv filter and other affected parameters', () => {
+  it('updates conv filter and affected parameters', () => {
     const newState = controlsReducer(
       {
         ...testInitialState,
@@ -308,7 +328,7 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
       },
       {
         type: 'UPDATE_CONV_FILTER_MATRIX',
-        convFilterIndex: 1,
+        convFilterIndex: 2,
         // prettier-ignore
         filter: [
           10, 20, 30,
@@ -324,8 +344,8 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
       }
     );
 
-    expect(newState.convFilters[1]).toEqual({
-      ...testInitialState.convFilters[1],
+    expect(newState.convFilters[2]).toEqual({
+      ...testInitialState.convFilters[2],
       // prettier-ignore
       filter: [
         10, 20, 30,
@@ -342,6 +362,7 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
     });
 
     expect(newState).toMatchObject({
+      convFilterIndex: 2,
       convStride: 3,
       convPadding: 0,
       outputDataWidth: 170,

@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react';
 import ImageInput2 from './ImageInput2';
+import Controls2 from './Controls2';
 import {
   initialControlsState,
   controlsReducer,
@@ -31,6 +32,7 @@ export default function App2() {
             padding={inputPadding}
           />
         </div>
+        <Controls2 />
         <style jsx>{`
           .container {
             padding: 10px;
