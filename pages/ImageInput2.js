@@ -152,6 +152,7 @@ export default function ImageInput2() {
       />
       <style jsx>{`
         .container {
+          flex-shrink: 0;
           width: ${displayWidth + containerWhitespace}px;
           height: ${displayHeight + containerWhitespace}px;
         }
