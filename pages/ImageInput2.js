@@ -1,6 +1,13 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { ControlsContext } from '../utils/controlsReducer';
-import { MAX_SCALE, MAX_PADDING, IMAGES } from '../utils/constants';
+import {
+  INPUT_DISPLAY_WIDTH,
+  INPUT_DISPLAY_HEIGHT,
+  LAYER_TYPES,
+  MAX_SCALE,
+  MAX_PADDING,
+  IMAGES,
+} from '../utils/constants';
 import { filterChannels } from '../utils/shared';
 
 function useImage(src) {
@@ -55,16 +62,20 @@ function useCanvas() {
   return [ref, context];
 }
 
-export default function ImageInput2(props) {
-  const { displayWidth, displayHeight, padding } = props;
+export default function ImageInput2() {
   const { controls } = useContext(ControlsContext);
   const {
+    layerType,
     inputImageIndex,
     hasRedChannel,
     hasGreenChannel,
     hasBlueChannel,
+    convPadding,
     scale,
   } = controls;
+  const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
+  const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
+  const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
   const [image, imageWidth, imageHeight] = useImage(
     IMAGES[inputImageIndex].src
   );
