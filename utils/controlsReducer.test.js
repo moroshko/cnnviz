@@ -33,6 +33,7 @@ it('initial state has the right shape', () => {
       scale: expect.any(Number),
       outputDataWidth: expect.any(Number),
       outputDataHeight: expect.any(Number),
+      inputData: null,
     })
   );
 });
@@ -109,6 +110,7 @@ const testInitialState = {
   scale: 1,
   outputDataWidth: 512,
   outputDataHeight: 384,
+  inputData: null,
 };
 
 describe('UPDATE_INPUT_TYPE', () => {
@@ -407,5 +409,16 @@ describe('UPDATE_POOL_STRIDE', () => {
       outputDataWidth: 511,
       outputDataHeight: 383,
     });
+  });
+});
+
+describe('UPDATE_INPUT_DATA', () => {
+  it('updates input data', () => {
+    expect(
+      controlsReducer(testInitialState, {
+        type: 'UPDATE_INPUT_DATA',
+        inputData: new Uint8ClampedArray([1, 2, 3, 4]),
+      }).inputData
+    ).toEqual(new Uint8ClampedArray([1, 2, 3, 4]));
   });
 });

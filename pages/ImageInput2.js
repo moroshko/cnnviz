@@ -63,7 +63,7 @@ function useCanvas() {
 }
 
 export default function ImageInput2() {
-  const { controls } = useContext(ControlsContext);
+  const { controls, dispatchControlsChange } = useContext(ControlsContext);
   const {
     layerType,
     inputImageIndex,
@@ -84,57 +84,72 @@ export default function ImageInput2() {
   const displayCanvasTranslate = MAX_PADDING * MAX_SCALE - padding * scale;
   const containerWhitespace = displayCanvasTranslate << 1;
 
-  useEffect(() => {
-    if (
-      image === null ||
-      imageWidth === null ||
-      imageHeight === null ||
-      dataCanvasContext === null ||
-      displayCanvasContext === null
-    ) {
-      return;
-    }
-
-    dataCanvasContext.drawImage(
-      image,
-      padding,
-      padding,
-      imageWidth,
-      imageHeight
-    );
-
-    const { width: inputWidth, height: inputHeight } = dataCanvasRef.current;
-    const { data: imageData } = dataCanvasContext.getImageData(
-      0,
-      0,
-      inputWidth,
-      inputHeight
-    );
-    const inputData = filterChannels({
-      data: imageData,
-      r: hasRedChannel,
-      g: hasGreenChannel,
-      b: hasBlueChannel,
-      a: true,
-    });
-
-    createImageBitmap(new ImageData(inputData, inputWidth, inputHeight)).then(
-      imageBitmap => {
-        displayCanvasContext.imageSmoothingEnabled = false;
-        displayCanvasContext.drawImage(
-          imageBitmap,
-          0,
-          0,
-          inputWidth,
-          inputHeight,
-          0,
-          0,
-          displayWidth,
-          displayHeight
-        );
+  useEffect(
+    () => {
+      if (
+        image === null ||
+        imageWidth === null ||
+        imageHeight === null ||
+        dataCanvasContext === null ||
+        displayCanvasContext === null
+      ) {
+        return;
       }
-    );
-  });
+
+      dataCanvasContext.drawImage(
+        image,
+        padding,
+        padding,
+        imageWidth,
+        imageHeight
+      );
+
+      const { width: inputWidth, height: inputHeight } = dataCanvasRef.current;
+      const { data: imageData } = dataCanvasContext.getImageData(
+        0,
+        0,
+        inputWidth,
+        inputHeight
+      );
+      const inputData = filterChannels({
+        data: imageData,
+        r: hasRedChannel,
+        g: hasGreenChannel,
+        b: hasBlueChannel,
+        a: true,
+      });
+
+      dispatchControlsChange({ type: 'UPDATE_INPUT_DATA', inputData });
+
+      createImageBitmap(new ImageData(inputData, inputWidth, inputHeight)).then(
+        imageBitmap => {
+          displayCanvasContext.imageSmoothingEnabled = false;
+          displayCanvasContext.drawImage(
+            imageBitmap,
+            0,
+            0,
+            inputWidth,
+            inputHeight,
+            0,
+            0,
+            displayWidth,
+            displayHeight
+          );
+        }
+      );
+    },
+    [
+      image,
+      imageWidth,
+      imageHeight,
+      padding,
+      hasRedChannel,
+      hasGreenChannel,
+      hasBlueChannel,
+      displayWidth,
+      displayHeight,
+    ]
+  );
 
   return (
     <div className="container">
