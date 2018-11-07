@@ -108,6 +108,8 @@ const initialControlsState = {
   poolFilterSize: 2,
   poolStride: 2,
   inputData: null,
+  inputWidth: null,
+  inputHeight: null,
 };
 
 initialControlsState.convPadding = getConvPadding(initialControlsState);
@@ -371,11 +373,13 @@ function controlsReducer(state, action) {
     }
 
     case 'UPDATE_INPUT_DATA': {
-      const { inputData } = action;
+      const { inputData, inputWidth, inputHeight } = action;
 
       return {
         ...state,
         inputData,
+        inputWidth,
+        inputHeight,
       };
     }
 

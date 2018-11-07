@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useCanvas } from '../hooks/useCanvas';
 import { ControlsContext } from '../utils/controlsReducer';
 import {
   INPUT_DISPLAY_WIDTH,
@@ -45,21 +46,6 @@ function useImage(src) {
   );
 
   return [image, width, height];
-}
-
-function useCanvas() {
-  const [context, setContext] = useState(null);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const context = ref.current.getContext('2d', {
-      alpha: false,
-    });
-
-    setContext(context);
-  }, []);
-
-  return [ref, context];
 }
 
 export default function ImageInput2() {
@@ -119,7 +105,12 @@ export default function ImageInput2() {
         a: true,
       });
 
-      dispatchControlsChange({ type: 'UPDATE_INPUT_DATA', inputData });
+      dispatchControlsChange({
+        type: 'UPDATE_INPUT_DATA',
+        inputData,
+        inputWidth,
+        inputHeight,
+      });
 
       createImageBitmap(new ImageData(inputData, inputWidth, inputHeight)).then(
         imageBitmap => {
