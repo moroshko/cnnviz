@@ -1,4 +1,6 @@
 import { INPUT_TYPES, LAYER_TYPES } from './constants';
+import { randomInputData } from './testing';
+import { convolve } from './convolution';
 import { initialControlsState, controlsReducer } from './controlsReducer';
 
 function expectEnum(ENUM_OBJECT) {
@@ -31,9 +33,12 @@ it('initial state has the right shape', () => {
       poolStride: expect.any(Number),
       convPadding: expect.any(Number),
       scale: expect.any(Number),
+      inputData: null,
+      inputWidth: null,
+      inputHeight: null,
+      outputData: null,
       outputDataWidth: expect.any(Number),
       outputDataHeight: expect.any(Number),
-      inputData: null,
     })
   );
 });
@@ -108,12 +113,15 @@ const testInitialState = {
   poolStride: 2,
   convPadding: 1,
   scale: 1,
+  inputData: null,
+  inputWidth: null,
+  inputHeight: null,
+  outputData: null,
   outputDataWidth: 512,
   outputDataHeight: 384,
-  inputData: null,
 };
 
-describe('UPDATE_INPUT_TYPE', () => {
+describe('INPUT_TYPE_CHANGE', () => {
   it('updates input type and affected parameters', () => {
     expect(
       controlsReducer(
@@ -123,7 +131,7 @@ describe('UPDATE_INPUT_TYPE', () => {
           inputImageIndex: 1,
         },
         {
-          type: 'UPDATE_INPUT_TYPE',
+          type: 'INPUT_TYPE_CHANGE',
           inputType: INPUT_TYPES.IMAGE,
         }
       )
@@ -136,11 +144,11 @@ describe('UPDATE_INPUT_TYPE', () => {
   });
 });
 
-describe('UPDATE_INPUT_IMAGE', () => {
+describe('INPUT_IMAGE_CHANGE', () => {
   it('updates input image and affected parameters', () => {
     expect(
       controlsReducer(testInitialState, {
-        type: 'UPDATE_INPUT_IMAGE',
+        type: 'INPUT_IMAGE_CHANGE',
         inputImageIndex: 1,
       })
     ).toMatchObject({
@@ -152,11 +160,11 @@ describe('UPDATE_INPUT_IMAGE', () => {
   });
 });
 
-describe('UPDATE_CHANNELS', () => {
+describe('CHANNELS_CHANGE', () => {
   it('updates a single channel', () => {
     expect(
       controlsReducer(testInitialState, {
-        type: 'UPDATE_CHANNELS',
+        type: 'CHANNELS_CHANGE',
         hasRedChannel: false,
       })
     ).toEqual(
@@ -171,7 +179,7 @@ describe('UPDATE_CHANNELS', () => {
   it('updates multiple channels', () => {
     expect(
       controlsReducer(testInitialState, {
-        type: 'UPDATE_CHANNELS',
+        type: 'CHANNELS_CHANGE',
         hasGreenChannel: false,
         hasBlueChannel: false,
       })
@@ -185,11 +193,11 @@ describe('UPDATE_CHANNELS', () => {
   });
 });
 
-describe('UPDATE_LAYER_TYPE', () => {
+describe('LAYER_TYPE_CHANGE', () => {
   it('updates layer type and affected parameters', () => {
     expect(
       controlsReducer(testInitialState, {
-        type: 'UPDATE_LAYER_TYPE',
+        type: 'LAYER_TYPE_CHANGE',
         layerType: LAYER_TYPES.POOL,
       })
     ).toMatchObject({
@@ -200,11 +208,11 @@ describe('UPDATE_LAYER_TYPE', () => {
   });
 });
 
-describe('UPDATE_CONV_STRIDE', () => {
+describe('CONV_STRIDE_CHANGE', () => {
   it('updates conv stride and affected parameters', () => {
     expect(
       controlsReducer(testInitialState, {
-        type: 'UPDATE_CONV_STRIDE',
+        type: 'CONV_STRIDE_CHANGE',
         convStride: 2,
       })
     ).toMatchObject({
@@ -216,19 +224,20 @@ describe('UPDATE_CONV_STRIDE', () => {
   });
 });
 
-describe('UPDATE_CONV_FILTER_INDEX', () => {
+describe('CONV_FILTER_INDEX_CHANGE', () => {
   it('updates conv filter index and affected parameters', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'UPDATE_CONV_FILTER_INDEX',
-        convFilterIndex: 1,
-      })
-    ).toMatchObject({
+    const newState = controlsReducer(testInitialState, {
+      type: 'CONV_FILTER_INDEX_CHANGE',
+      convFilterIndex: 1,
+    });
+
+    expect(newState).toMatchObject({
       convFilterIndex: 1,
       convPadding: 2,
       outputDataWidth: 512,
       outputDataHeight: 384,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 
   it('when the stride becomes invalid, updates the stride to the new max possible', () => {
@@ -241,7 +250,7 @@ describe('UPDATE_CONV_FILTER_INDEX', () => {
           convPadding: 0,
         },
         {
-          type: 'UPDATE_CONV_FILTER_INDEX',
+          type: 'CONV_FILTER_INDEX_CHANGE',
           convFilterIndex: 0,
         }
       )
@@ -252,51 +261,52 @@ describe('UPDATE_CONV_FILTER_INDEX', () => {
   });
 });
 
-describe('UPDATE_CONV_FILTER_MATRIX', () => {
+describe('CONV_FILTER_MATRIX_CHANGE', () => {
   it('does not update the conv filter when the filter is not editable', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'UPDATE_CONV_FILTER_MATRIX',
-        convFilterIndex: 0,
-        // prettier-ignore
-        filter: [
-          1, 2, 3,
-          4, 5, 6,
-          7, 8, 100
-        ],
-        // prettier-ignore
-        errors: [
-          false, false, false,
-          false, false, false,
-          false, false, false
-        ]
-      }).convFilters[0]
-    ).toEqual(testInitialState.convFilters[0]);
+    const newState = controlsReducer(testInitialState, {
+      type: 'CONV_FILTER_MATRIX_CHANGE',
+      convFilterIndex: 0,
+      // prettier-ignore
+      filter: [
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 100
+      ],
+      // prettier-ignore
+      errors: [
+        false, false, false,
+        false, false, false,
+        false, false, false
+      ]
+    });
+
+    expect(newState.convFilters[0]).toEqual(testInitialState.convFilters[0]);
+    expect(newState.outputData).toBe(testInitialState.outputData);
   });
 
   it('updates conv filter with errors', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'UPDATE_CONV_FILTER_MATRIX',
-        convFilterIndex: 1,
-        // prettier-ignore
-        filter: [
-           -0.1, -0.2, -0.3, -0.4,  -0.5,
-            0.6,  0.7,  0.8,  0.9,     1,
-              0,   10,   20,   30,    40,
-            -15,  -20,  -25,   80,   100,
-          14.98, 18.2, -2.4, 0.02, "-0.01abc"
-        ],
-        // prettier-ignore
-        errors: [
-          false, false, false, false, false,
-          false, false, false, false, false,
-          false, false, false, false, false,
-          false, false, false, false, false,
-          false, false, false, false, true,
-        ]
-      }).convFilters[1]
-    ).toEqual({
+    const newState = controlsReducer(testInitialState, {
+      type: 'CONV_FILTER_MATRIX_CHANGE',
+      convFilterIndex: 1,
+      // prettier-ignore
+      filter: [
+         -0.1, -0.2, -0.3, -0.4,  -0.5,
+          0.6,  0.7,  0.8,  0.9,     1,
+            0,   10,   20,   30,    40,
+          -15,  -20,  -25,   80,   100,
+        14.98, 18.2, -2.4, 0.02, "-0.01abc"
+      ],
+      // prettier-ignore
+      errors: [
+        false, false, false, false, false,
+        false, false, false, false, false,
+        false, false, false, false, false,
+        false, false, false, false, false,
+        false, false, false, false, true,
+      ]
+    });
+
+    expect(newState.convFilters[1]).toEqual({
       ...testInitialState.convFilters[1],
       // prettier-ignore
       filter: [
@@ -315,6 +325,7 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
         false, false, false, false, true,
       ]
     });
+    expect(newState.outputData).toBe(testInitialState.outputData);
   });
 
   it('updates conv filter and affected parameters', () => {
@@ -326,7 +337,7 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
         convPadding: 0,
       },
       {
-        type: 'UPDATE_CONV_FILTER_MATRIX',
+        type: 'CONV_FILTER_MATRIX_CHANGE',
         convFilterIndex: 2,
         // prettier-ignore
         filter: [
@@ -359,7 +370,6 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
         false, false, false
       ]
     });
-
     expect(newState).toMatchObject({
       convFilterIndex: 2,
       convStride: 3,
@@ -367,10 +377,11 @@ describe('UPDATE_CONV_FILTER_MATRIX', () => {
       outputDataWidth: 170,
       outputDataHeight: 128,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
-describe('UPDATE_POOL_FILTER_SIZE', () => {
+describe('POOL_FILTER_SIZE_CHANGE', () => {
   it('updates pool filter size and affected parameters', () => {
     expect(
       controlsReducer(
@@ -379,7 +390,7 @@ describe('UPDATE_POOL_FILTER_SIZE', () => {
           layerType: LAYER_TYPES.POOL,
         },
         {
-          type: 'UPDATE_POOL_FILTER_SIZE',
+          type: 'POOL_FILTER_SIZE_CHANGE',
           poolFilterSize: 3,
         }
       )
@@ -391,7 +402,7 @@ describe('UPDATE_POOL_FILTER_SIZE', () => {
   });
 });
 
-describe('UPDATE_POOL_STRIDE', () => {
+describe('POOL_STRIDE_CHANGE', () => {
   it('updates pool stride and affected parameters', () => {
     expect(
       controlsReducer(
@@ -400,7 +411,7 @@ describe('UPDATE_POOL_STRIDE', () => {
           layerType: LAYER_TYPES.POOL,
         },
         {
-          type: 'UPDATE_POOL_STRIDE',
+          type: 'POOL_STRIDE_CHANGE',
           poolStride: 1,
         }
       )
@@ -412,27 +423,41 @@ describe('UPDATE_POOL_STRIDE', () => {
   });
 });
 
-describe('UPDATE_INPUT_DATA', () => {
-  it('updates input data', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'UPDATE_INPUT_DATA',
-        // prettier-ignore
-        inputData: new Uint8ClampedArray([
-           1,  2,  3,  4,     5,  6,  7,  8,    9, 10, 11, 12,
-          13, 14, 15, 16,    17, 18, 19, 20,   21, 22, 23, 24
-        ]),
-        inputWidth: 3,
-        inputHeight: 2,
-      })
-    ).toMatchObject({
-      // prettier-ignore
-      inputData: new Uint8ClampedArray([
-         1,  2,  3,  4,     5,  6,  7,  8,    9, 10, 11, 12,
-        13, 14, 15, 16,    17, 18, 19, 20,   21, 22, 23, 24
-      ]),
-      inputWidth: 3,
-      inputHeight: 2,
+describe('INPUT_DATA_CHANGE', () => {
+  it('updates input data and affected parameters', () => {
+    const inputWidth = 514;
+    const inputHeight = 386;
+    const inputData = randomInputData(inputWidth, inputHeight);
+    const {
+      convFilters,
+      convFilterIndex,
+      convStride,
+      outputDataWidth,
+      outputDataHeight,
+    } = testInitialState;
+    const { filter, filterSize } = convFilters[convFilterIndex];
+    const { outputData } = convolve({
+      inputWidth,
+      inputHeight,
+      inputData,
+      filter,
+      filterSize,
+      stride: convStride,
+      outputWidth: outputDataWidth,
+      outputHeight: outputDataHeight,
     });
+    const newState = controlsReducer(testInitialState, {
+      type: 'INPUT_DATA_CHANGE',
+      inputData,
+      inputWidth,
+      inputHeight,
+    });
+
+    expect(newState.inputData).toBe(inputData);
+    expect(newState).toMatchObject({
+      inputWidth,
+      inputHeight,
+    });
+    expect(newState.outputData).toEqual(outputData);
   });
 });

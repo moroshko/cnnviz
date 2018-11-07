@@ -7,6 +7,8 @@ import {
   IMAGES,
 } from './constants';
 import { getOutputDimensions } from './shared';
+import { convolve } from './convolution';
+import { pool } from './pooling';
 
 // prettier-ignore
 const INITIAL_CONV_FILTERS = [
@@ -110,6 +112,7 @@ const initialControlsState = {
   inputData: null,
   inputWidth: null,
   inputHeight: null,
+  outputData: null,
 };
 
 initialControlsState.convPadding = getConvPadding(initialControlsState);
@@ -127,9 +130,57 @@ const {
 initialControlsState.outputDataWidth = outputDataWidth;
 initialControlsState.outputDataHeight = outputDataHeight;
 
+function getOutputData(state, inputData) {
+  const {
+    layerType,
+    convFilters,
+    convFilterIndex,
+    convStride,
+    poolFilterSize,
+    poolStride,
+    inputWidth,
+    inputHeight,
+    outputDataWidth,
+    outputDataHeight,
+  } = state;
+
+  switch (layerType) {
+    case LAYER_TYPES.CONV: {
+      const { filter, filterSize } = convFilters[convFilterIndex];
+
+      return convolve({
+        inputWidth,
+        inputHeight,
+        inputData,
+        filter,
+        filterSize,
+        stride: convStride,
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight,
+      }).outputData;
+    }
+
+    case LAYER_TYPES.POOL: {
+      return pool({
+        inputWidth,
+        inputHeight,
+        inputData,
+        filterSize: poolFilterSize,
+        stride: poolStride,
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight,
+      }).outputData;
+    }
+
+    default: {
+      throw new Error(`Unknown layer type: ${layerType}`);
+    }
+  }
+}
+
 function controlsReducer(state, action) {
   switch (action.type) {
-    case 'UPDATE_INPUT_TYPE': {
+    case 'INPUT_TYPE_CHANGE': {
       const { inputType } = action;
       const { inputImageIndex } = state;
       const newScale = getScale({ inputType, inputImageIndex });
@@ -151,7 +202,7 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_INPUT_IMAGE': {
+    case 'INPUT_IMAGE_CHANGE': {
       const { inputImageIndex } = action;
       const { inputType } = state;
       const newScale = getScale({
@@ -176,7 +227,7 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_CHANNELS': {
+    case 'CHANNELS_CHANGE': {
       const { hasRedChannel, hasGreenChannel, hasBlueChannel } = action;
 
       return {
@@ -190,7 +241,7 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_LAYER_TYPE': {
+    case 'LAYER_TYPE_CHANGE': {
       const { scale } = state;
       const { layerType } = action;
       const {
@@ -213,7 +264,7 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_CONV_STRIDE': {
+    case 'CONV_STRIDE_CHANGE': {
       const { convStride } = action;
       const { convFilters, convFilterIndex, scale } = state;
       const newConvPadding = getConvPadding({
@@ -241,9 +292,9 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_CONV_FILTER_INDEX': {
+    case 'CONV_FILTER_INDEX_CHANGE': {
       const { convFilterIndex } = action;
-      const { convFilters, convStride, scale } = state;
+      const { convFilters, convStride, scale, inputData } = state;
       const newConvStride = Math.min(
         convStride,
         convFilters[convFilterIndex].filterSize
@@ -263,8 +314,7 @@ function controlsReducer(state, action) {
         padding: newConvPadding,
         stride: newConvStride,
       });
-
-      return {
+      const newState = {
         ...state,
         convFilterIndex,
         convStride: newConvStride,
@@ -272,9 +322,15 @@ function controlsReducer(state, action) {
         outputDataWidth,
         outputDataHeight,
       };
+      const outputData = getOutputData(newState, inputData);
+
+      return {
+        ...newState,
+        outputData,
+      };
     }
 
-    case 'UPDATE_CONV_FILTER_MATRIX': {
+    case 'CONV_FILTER_MATRIX_CHANGE': {
       const { convFilterIndex, filter, errors } = action;
       const { convFilters } = state;
 
@@ -299,7 +355,7 @@ function controlsReducer(state, action) {
         };
       }
 
-      const { convStride, scale } = state;
+      const { convStride, scale, inputData } = state;
       const newConvStride = Math.min(convStride, filterSize);
       const newConvPadding = getConvPadding({
         convFilters: newConvFilters,
@@ -316,8 +372,7 @@ function controlsReducer(state, action) {
         padding: newConvPadding,
         stride: newConvStride,
       });
-
-      return {
+      const newState = {
         ...state,
         convFilters: newConvFilters,
         convFilterIndex,
@@ -326,9 +381,15 @@ function controlsReducer(state, action) {
         outputDataWidth,
         outputDataHeight,
       };
+      const outputData = getOutputData(newState, inputData);
+
+      return {
+        ...newState,
+        outputData,
+      };
     }
 
-    case 'UPDATE_POOL_FILTER_SIZE': {
+    case 'POOL_FILTER_SIZE_CHANGE': {
       const { poolFilterSize } = action;
       const { poolStride, scale } = state;
       const {
@@ -350,7 +411,7 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_POOL_STRIDE': {
+    case 'POOL_STRIDE_CHANGE': {
       const { poolStride } = action;
       const { poolFilterSize, scale } = state;
       const {
@@ -372,14 +433,19 @@ function controlsReducer(state, action) {
       };
     }
 
-    case 'UPDATE_INPUT_DATA': {
+    case 'INPUT_DATA_CHANGE': {
       const { inputData, inputWidth, inputHeight } = action;
-
-      return {
+      const newState = {
         ...state,
         inputData,
         inputWidth,
         inputHeight,
+      };
+      const outputData = getOutputData(newState, inputData);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 

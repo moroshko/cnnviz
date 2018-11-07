@@ -63,7 +63,7 @@ export default function Controls2() {
               name="inputType"
               value={_inputType}
               checked={_inputType === inputType}
-              onChange={dispatchString('UPDATE_INPUT_TYPE', 'inputType')}
+              onChange={dispatchString('INPUT_TYPE_CHANGE', 'inputType')}
             />
             {INPUT_TYPES_LABELS[_inputType]}
           </label>
@@ -79,7 +79,7 @@ export default function Controls2() {
                 value={index}
                 checked={index === inputImageIndex}
                 onChange={dispatchNumber(
-                  'UPDATE_INPUT_IMAGE',
+                  'INPUT_IMAGE_CHANGE',
                   'inputImageIndex'
                 )}
               />
@@ -94,7 +94,7 @@ export default function Controls2() {
           <input
             type="checkbox"
             checked={hasRedChannel}
-            onChange={dispatchBoolean('UPDATE_CHANNELS', 'hasRedChannel')}
+            onChange={dispatchBoolean('CHANNELS_CHANGE', 'hasRedChannel')}
           />
           Red
         </label>
@@ -102,7 +102,7 @@ export default function Controls2() {
           <input
             type="checkbox"
             checked={hasGreenChannel}
-            onChange={dispatchBoolean('UPDATE_CHANNELS', 'hasGreenChannel')}
+            onChange={dispatchBoolean('CHANNELS_CHANGE', 'hasGreenChannel')}
           />
           Green
         </label>
@@ -110,7 +110,7 @@ export default function Controls2() {
           <input
             type="checkbox"
             checked={hasBlueChannel}
-            onChange={dispatchBoolean('UPDATE_CHANNELS', 'hasBlueChannel')}
+            onChange={dispatchBoolean('CHANNELS_CHANGE', 'hasBlueChannel')}
           />
           Blue
         </label>
@@ -124,7 +124,7 @@ export default function Controls2() {
               name="layerType"
               value={_layerType}
               checked={_layerType === layerType}
-              onChange={dispatchString('UPDATE_LAYER_TYPE', 'layerType')}
+              onChange={dispatchString('LAYER_TYPE_CHANGE', 'layerType')}
             />
             {LAYER_TYPES_LABELS[_layerType]}
           </label>
@@ -138,7 +138,7 @@ export default function Controls2() {
             min="1"
             max={convFilters[convFilterIndex].filterSize}
             value={convStride}
-            onChange={dispatchNumber('UPDATE_CONV_STRIDE', 'convStride')}
+            onChange={dispatchNumber('CONV_STRIDE_CHANGE', 'convStride')}
           />
           {convStride}
         </div>
@@ -152,7 +152,7 @@ export default function Controls2() {
             max="5"
             value={poolFilterSize}
             onChange={dispatchNumber(
-              'UPDATE_POOL_FILTER_SIZE',
+              'POOL_FILTER_SIZE_CHANGE',
               'poolFilterSize'
             )}
           />
@@ -167,7 +167,7 @@ export default function Controls2() {
             min="1"
             max="5"
             value={poolStride}
-            onChange={dispatchNumber('UPDATE_POOL_STRIDE', 'poolStride')}
+            onChange={dispatchNumber('POOL_STRIDE_CHANGE', 'poolStride')}
           />
           {poolStride}
         </div>
@@ -184,7 +184,7 @@ export default function Controls2() {
                   value={index}
                   checked={index === convFilterIndex}
                   onChange={dispatchNumber(
-                    'UPDATE_CONV_FILTER_INDEX',
+                    'CONV_FILTER_INDEX_CHANGE',
                     'convFilterIndex'
                   )}
                 />
@@ -198,7 +198,7 @@ export default function Controls2() {
                 errors={convFilter.errors}
                 onChange={(filter, errors) => {
                   dispatchControlsChange({
-                    type: 'UPDATE_CONV_FILTER_MATRIX',
+                    type: 'CONV_FILTER_MATRIX_CHANGE',
                     convFilterIndex: index,
                     filter,
                     errors,

@@ -1,4 +1,5 @@
-const { addPadding, mapToPixels } = require('./shared');
+const { mapToPixels } = require('./shared');
+const { addPadding } = require('./testing');
 const { convolve } = require('./convolution');
 
 // prettier-ignore

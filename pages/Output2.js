@@ -1,73 +1,23 @@
 import React, { useEffect, useContext } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
-import { LAYER_TYPES, MAX_SCALE, MAX_PADDING } from '../utils/constants';
-import { convolve } from '../utils/convolution';
-import { pool } from '../utils/pooling';
+import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { ControlsContext } from '../utils/controlsReducer';
 
 export default function Output2() {
   const [canvasRef, canvasContext] = useCanvas();
   const { controls } = useContext(ControlsContext);
-  const {
-    layerType,
-    convFilters,
-    convFilterIndex,
-    convStride,
-    poolFilterSize,
-    poolStride,
-    outputDataWidth,
-    outputDataHeight,
-    scale,
-    inputData,
-    inputWidth,
-    inputHeight,
-  } = controls;
+  const { outputDataWidth, outputDataHeight, scale, outputData } = controls;
   const outputWidth = outputDataWidth * scale;
   const outputHeight = outputDataHeight * scale;
 
-  function getOutputData() {
-    switch (layerType) {
-      case LAYER_TYPES.CONV: {
-        const { filter, filterSize } = convFilters[convFilterIndex];
-
-        return convolve({
-          inputWidth,
-          inputHeight,
-          inputData,
-          filter,
-          filterSize,
-          stride: convStride,
-          outputWidth: outputDataWidth,
-          outputHeight: outputDataHeight,
-        }).outputData;
-      }
-
-      case LAYER_TYPES.POOL: {
-        return pool({
-          inputWidth,
-          inputHeight,
-          inputData,
-          filterSize: poolFilterSize,
-          stride: poolStride,
-          outputWidth: outputDataWidth,
-          outputHeight: outputDataHeight,
-        }).outputData;
-      }
-
-      default: {
-        throw new Error(`Unknown layer type: ${layerType}`);
-      }
-    }
-  }
-
   useEffect(
     () => {
-      if (inputData === null) {
+      if (outputData === null) {
         return;
       }
 
       const imageData = new ImageData(
-        getOutputData(),
+        outputData,
         outputDataWidth,
         outputDataHeight
       );
@@ -87,7 +37,7 @@ export default function Output2() {
         );
       });
     },
-    [inputData]
+    [outputData]
   );
 
   return (

@@ -106,7 +106,7 @@ export default function ImageInput2() {
       });
 
       dispatchControlsChange({
-        type: 'UPDATE_INPUT_DATA',
+        type: 'INPUT_DATA_CHANGE',
         inputData,
         inputWidth,
         inputHeight,
