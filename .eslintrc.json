@@ -18,9 +18,10 @@
       "version": "16.7.0-alpha.0"
     }
   },
-  "plugins": ["react"],
+  "plugins": ["react", "react-hooks"],
   "rules": {
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_$" }],
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "error"
   }
 }
