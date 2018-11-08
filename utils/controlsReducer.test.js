@@ -123,40 +123,42 @@ const testInitialState = {
 
 describe('INPUT_TYPE_CHANGE', () => {
   it('updates input type and affected parameters', () => {
-    expect(
-      controlsReducer(
-        {
-          ...testInitialState,
-          inputType: INPUT_TYPES.CAMERA,
-          inputImageIndex: 1,
-        },
-        {
-          type: 'INPUT_TYPE_CHANGE',
-          inputType: INPUT_TYPES.IMAGE,
-        }
-      )
-    ).toMatchObject({
+    const newState = controlsReducer(
+      {
+        ...testInitialState,
+        inputType: INPUT_TYPES.CAMERA,
+        inputImageIndex: 1,
+      },
+      {
+        type: 'INPUT_TYPE_CHANGE',
+        inputType: INPUT_TYPES.IMAGE,
+      }
+    );
+
+    expect(newState).toMatchObject({
       inputType: INPUT_TYPES.IMAGE,
       scale: 16,
       outputDataWidth: 32,
       outputDataHeight: 24,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
 describe('INPUT_IMAGE_CHANGE', () => {
   it('updates input image and affected parameters', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'INPUT_IMAGE_CHANGE',
-        inputImageIndex: 1,
-      })
-    ).toMatchObject({
+    const newState = controlsReducer(testInitialState, {
+      type: 'INPUT_IMAGE_CHANGE',
+      inputImageIndex: 1,
+    });
+
+    expect(newState).toMatchObject({
       inputImageIndex: 1,
       scale: 16,
       outputDataWidth: 32,
       outputDataHeight: 24,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
@@ -195,32 +197,34 @@ describe('CHANNELS_CHANGE', () => {
 
 describe('LAYER_TYPE_CHANGE', () => {
   it('updates layer type and affected parameters', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'LAYER_TYPE_CHANGE',
-        layerType: LAYER_TYPES.POOL,
-      })
-    ).toMatchObject({
+    const newState = controlsReducer(testInitialState, {
+      type: 'LAYER_TYPE_CHANGE',
+      layerType: LAYER_TYPES.POOL,
+    });
+
+    expect(newState).toMatchObject({
       layerType: LAYER_TYPES.POOL,
       outputDataWidth: 256,
       outputDataHeight: 192,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
 describe('CONV_STRIDE_CHANGE', () => {
   it('updates conv stride and affected parameters', () => {
-    expect(
-      controlsReducer(testInitialState, {
-        type: 'CONV_STRIDE_CHANGE',
-        convStride: 2,
-      })
-    ).toMatchObject({
+    const newState = controlsReducer(testInitialState, {
+      type: 'CONV_STRIDE_CHANGE',
+      convStride: 2,
+    });
+
+    expect(newState).toMatchObject({
       convStride: 2,
       convPadding: 0,
       outputDataWidth: 255,
       outputDataHeight: 191,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
@@ -383,43 +387,45 @@ describe('CONV_FILTER_MATRIX_CHANGE', () => {
 
 describe('POOL_FILTER_SIZE_CHANGE', () => {
   it('updates pool filter size and affected parameters', () => {
-    expect(
-      controlsReducer(
-        {
-          ...testInitialState,
-          layerType: LAYER_TYPES.POOL,
-        },
-        {
-          type: 'POOL_FILTER_SIZE_CHANGE',
-          poolFilterSize: 3,
-        }
-      )
-    ).toMatchObject({
+    const newState = controlsReducer(
+      {
+        ...testInitialState,
+        layerType: LAYER_TYPES.POOL,
+      },
+      {
+        type: 'POOL_FILTER_SIZE_CHANGE',
+        poolFilterSize: 3,
+      }
+    );
+
+    expect(newState).toMatchObject({
       poolFilterSize: 3,
       outputDataWidth: 255,
       outputDataHeight: 191,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 
 describe('POOL_STRIDE_CHANGE', () => {
   it('updates pool stride and affected parameters', () => {
-    expect(
-      controlsReducer(
-        {
-          ...testInitialState,
-          layerType: LAYER_TYPES.POOL,
-        },
-        {
-          type: 'POOL_STRIDE_CHANGE',
-          poolStride: 1,
-        }
-      )
-    ).toMatchObject({
+    const newState = controlsReducer(
+      {
+        ...testInitialState,
+        layerType: LAYER_TYPES.POOL,
+      },
+      {
+        type: 'POOL_STRIDE_CHANGE',
+        poolStride: 1,
+      }
+    );
+
+    expect(newState).toMatchObject({
       poolStride: 1,
       outputDataWidth: 511,
       outputDataHeight: 383,
     });
+    expect(newState.outputData).not.toBe(testInitialState.outputData);
   });
 });
 

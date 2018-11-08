@@ -193,13 +193,18 @@ function controlsReducer(state, action) {
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
         ...getLayerSpecificParams(state),
       });
-
-      return {
+      const newState = {
         ...state,
         inputType,
         scale: newScale,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
@@ -218,13 +223,18 @@ function controlsReducer(state, action) {
         inputHeight: INPUT_DISPLAY_HEIGHT / newScale,
         ...getLayerSpecificParams(state),
       });
-
-      return {
+      const newState = {
         ...state,
         inputImageIndex,
         scale: newScale,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
@@ -256,12 +266,17 @@ function controlsReducer(state, action) {
           layerType,
         }),
       });
-
-      return {
+      const newState = {
         ...state,
         layerType,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
@@ -283,13 +298,18 @@ function controlsReducer(state, action) {
         padding: newConvPadding,
         stride: convStride,
       });
-
-      return {
+      const newState = {
         ...state,
         convStride,
         convPadding: newConvPadding,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
@@ -403,12 +423,17 @@ function controlsReducer(state, action) {
         padding: 0,
         stride: poolStride,
       });
-
-      return {
+      const newState = {
         ...state,
         poolFilterSize,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
@@ -425,12 +450,17 @@ function controlsReducer(state, action) {
         padding: 0,
         stride: poolStride,
       });
-
-      return {
+      const newState = {
         ...state,
         poolStride,
         outputDataWidth,
         outputDataHeight,
+      };
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
       };
     }
 
