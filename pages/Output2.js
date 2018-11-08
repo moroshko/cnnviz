@@ -52,9 +52,7 @@ export default function Output2() {
       <style jsx>{`
         .container {
           flex-shrink: 0;
-          width: ${outputWidth}px;
-          height: ${outputHeight}px;
-          transform: translateY(${MAX_PADDING * MAX_SCALE}px);
+          margin-top: ${MAX_PADDING * MAX_SCALE}px;
           margin-left: 20px;
         }
       `}</style>
