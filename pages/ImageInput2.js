@@ -10,6 +10,7 @@ import {
   IMAGES,
 } from '../utils/constants';
 import { filterChannels } from '../utils/shared';
+import Dimensions2 from './Dimensions2';
 
 function useImage(src) {
   const [prevSrc, setPrevSrc] = useState(null);
@@ -144,6 +145,14 @@ export default function ImageInput2() {
 
   return (
     <div className="container">
+      <div className="dimensions">
+        <Dimensions2
+          title="Input"
+          width={displayWidth / scale - (padding << 1)}
+          height={displayHeight / scale - (padding << 1)}
+          padding={padding}
+        />
+      </div>
       <canvas
         className="dataCanvas"
         width={displayWidth / scale}
@@ -161,6 +170,12 @@ export default function ImageInput2() {
           flex-shrink: 0;
           width: ${displayWidth + containerWhitespace}px;
           height: ${displayHeight + containerWhitespace}px;
+        }
+        .dimensions {
+          transform: translate(
+            ${displayCanvasTranslate}px,
+            ${displayCanvasTranslate}px
+          );
         }
         .dataCanvas {
           display: none;

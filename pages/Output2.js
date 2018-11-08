@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useContext } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { ControlsContext } from '../utils/controlsReducer';
+import Dimensions2 from './Dimensions2';
 
 export default function Output2() {
   const [canvasRef, canvasContext] = useCanvas();
@@ -42,6 +43,11 @@ export default function Output2() {
 
   return (
     <div className="container">
+      <Dimensions2
+        title="Output"
+        width={outputDataWidth}
+        height={outputDataHeight}
+      />
       <canvas width={outputWidth} height={outputHeight} ref={canvasRef} />
       <style jsx>{`
         .container {
@@ -50,7 +56,6 @@ export default function Output2() {
           height: ${outputHeight}px;
           transform: translateY(${MAX_PADDING * MAX_SCALE}px);
           margin-left: 20px;
-          background-color: white;
         }
       `}</style>
     </div>
