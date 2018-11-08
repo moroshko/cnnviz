@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useLayoutEffect } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { ControlsContext } from '../utils/controlsReducer';
 import {
@@ -70,7 +70,7 @@ export default function ImageInput2() {
   const displayCanvasTranslate = MAX_PADDING * MAX_SCALE - padding * scale;
   const containerWhitespace = displayCanvasTranslate << 1;
 
-  useEffect(
+  useLayoutEffect(
     () => {
       if (
         image === null ||

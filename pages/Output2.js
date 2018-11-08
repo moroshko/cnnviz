@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useLayoutEffect, useContext } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { ControlsContext } from '../utils/controlsReducer';
@@ -10,7 +10,7 @@ export default function Output2() {
   const outputWidth = outputDataWidth * scale;
   const outputHeight = outputDataHeight * scale;
 
-  useEffect(
+  useLayoutEffect(
     () => {
       if (outputData === null) {
         return;
