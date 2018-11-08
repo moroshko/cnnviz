@@ -98,7 +98,7 @@ function getLayerSpecificParams(state) {
 }
 
 const initialControlsState = {
-  inputType: INPUT_TYPES.IMAGE,
+  inputType: INPUT_TYPES.CAMERA,
   inputImageIndex: 0,
   hasRedChannel: true,
   hasGreenChannel: true,

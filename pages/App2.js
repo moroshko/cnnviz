@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import ImageInput2 from './ImageInput2';
+import Input2 from './Input2';
 import Output2 from './Output2';
 import Controls2 from './Controls2';
 import {
@@ -18,7 +18,7 @@ export default function App2() {
     <ControlsContext.Provider value={{ controls, dispatchControlsChange }}>
       <div className="container">
         <div className="inputAndOutputContainer">
-          <ImageInput2 />
+          <Input2 />
           <Output2 />
         </div>
         <Controls2 />

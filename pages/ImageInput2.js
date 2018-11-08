@@ -1,16 +1,19 @@
-import React, { useState, useContext, useEffect, useLayoutEffect } from 'react';
+import React, {
+  Fragment,
+  useState,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { ControlsContext } from '../utils/controlsReducer';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
   LAYER_TYPES,
-  MAX_SCALE,
-  MAX_PADDING,
   IMAGES,
 } from '../utils/constants';
 import { filterChannels } from '../utils/shared';
-import Dimensions2 from './Dimensions2';
 
 function useImage(src) {
   const [prevSrc, setPrevSrc] = useState(null);
@@ -68,8 +71,6 @@ export default function ImageInput2() {
   );
   const [dataCanvasRef, dataCanvasContext] = useCanvas();
   const [displayCanvasRef, displayCanvasContext] = useCanvas();
-  const displayCanvasTranslate = MAX_PADDING * MAX_SCALE - padding * scale;
-  const containerWhitespace = displayCanvasTranslate << 1;
 
   useLayoutEffect(
     () => {
@@ -144,15 +145,7 @@ export default function ImageInput2() {
   );
 
   return (
-    <div className="container">
-      <div className="dimensions">
-        <Dimensions2
-          title="Input"
-          width={displayWidth / scale - (padding << 1)}
-          height={displayHeight / scale - (padding << 1)}
-          padding={padding}
-        />
-      </div>
+    <Fragment>
       <canvas
         className="dataCanvas"
         width={displayWidth / scale}
@@ -160,33 +153,15 @@ export default function ImageInput2() {
         ref={dataCanvasRef}
       />
       <canvas
-        className="displayCanvas"
         width={displayWidth}
         height={displayHeight}
         ref={displayCanvasRef}
       />
       <style jsx>{`
-        .container {
-          flex-shrink: 0;
-          width: ${displayWidth + containerWhitespace}px;
-          height: ${displayHeight + containerWhitespace}px;
-        }
-        .dimensions {
-          transform: translate(
-            ${displayCanvasTranslate}px,
-            ${displayCanvasTranslate}px
-          );
-        }
         .dataCanvas {
           display: none;
         }
-        .displayCanvas {
-          transform: translate(
-            ${displayCanvasTranslate}px,
-            ${displayCanvasTranslate}px
-          );
-        }
       `}</style>
-    </div>
+    </Fragment>
   );
 }
