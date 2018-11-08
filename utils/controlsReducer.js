@@ -130,7 +130,7 @@ const {
 initialControlsState.outputDataWidth = outputDataWidth;
 initialControlsState.outputDataHeight = outputDataHeight;
 
-function getOutputData(state, inputData) {
+function getOutputData(state) {
   const {
     layerType,
     convFilters,
@@ -138,6 +138,7 @@ function getOutputData(state, inputData) {
     convStride,
     poolFilterSize,
     poolStride,
+    inputData,
     inputWidth,
     inputHeight,
     outputDataWidth,
@@ -294,7 +295,7 @@ function controlsReducer(state, action) {
 
     case 'CONV_FILTER_INDEX_CHANGE': {
       const { convFilterIndex } = action;
-      const { convFilters, convStride, scale, inputData } = state;
+      const { convFilters, convStride, scale } = state;
       const newConvStride = Math.min(
         convStride,
         convFilters[convFilterIndex].filterSize
@@ -322,7 +323,7 @@ function controlsReducer(state, action) {
         outputDataWidth,
         outputDataHeight,
       };
-      const outputData = getOutputData(newState, inputData);
+      const outputData = getOutputData(newState);
 
       return {
         ...newState,
@@ -355,7 +356,7 @@ function controlsReducer(state, action) {
         };
       }
 
-      const { convStride, scale, inputData } = state;
+      const { convStride, scale } = state;
       const newConvStride = Math.min(convStride, filterSize);
       const newConvPadding = getConvPadding({
         convFilters: newConvFilters,
@@ -381,7 +382,7 @@ function controlsReducer(state, action) {
         outputDataWidth,
         outputDataHeight,
       };
-      const outputData = getOutputData(newState, inputData);
+      const outputData = getOutputData(newState);
 
       return {
         ...newState,
@@ -441,7 +442,7 @@ function controlsReducer(state, action) {
         inputWidth,
         inputHeight,
       };
-      const outputData = getOutputData(newState, inputData);
+      const outputData = getOutputData(newState);
 
       return {
         ...newState,
