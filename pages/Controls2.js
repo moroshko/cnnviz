@@ -6,11 +6,11 @@ import {
   LAYER_TYPES_LABELS,
   IMAGES,
 } from '../utils/constants';
-import { ControlsContext } from '../utils/controlsReducer';
+import { AppContext } from '../utils/reducer';
 import Matrix from './Matrix';
 
 export default function Controls2() {
-  const { controls, dispatchControlsChange } = useContext(ControlsContext);
+  const { state, dispatchChange } = useContext(AppContext);
   const {
     inputType,
     inputImageIndex,
@@ -23,11 +23,11 @@ export default function Controls2() {
     convFilterIndex,
     poolFilterSize,
     poolStride,
-  } = controls;
+  } = state;
 
   function dispatchString(type, key) {
     return event => {
-      dispatchControlsChange({
+      dispatchChange({
         type,
         [key]: event.target.value,
       });
@@ -36,7 +36,7 @@ export default function Controls2() {
 
   function dispatchNumber(type, key) {
     return event => {
-      dispatchControlsChange({
+      dispatchChange({
         type,
         [key]: Number(event.target.value),
       });
@@ -45,7 +45,7 @@ export default function Controls2() {
 
   function dispatchBoolean(type, key) {
     return event => {
-      dispatchControlsChange({
+      dispatchChange({
         type,
         [key]: event.target.checked,
       });
@@ -197,7 +197,7 @@ export default function Controls2() {
                 data={convFilter.filter}
                 errors={convFilter.errors}
                 onChange={(filter, errors) => {
-                  dispatchControlsChange({
+                  dispatchChange({
                     type: 'CONV_FILTER_MATRIX_CHANGE',
                     convFilterIndex: index,
                     filter,

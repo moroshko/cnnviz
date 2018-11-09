@@ -2,20 +2,13 @@ import React, { useReducer } from 'react';
 import Input2 from './Input2';
 import Output2 from './Output2';
 import Controls2 from './Controls2';
-import {
-  initialControlsState,
-  controlsReducer,
-  ControlsContext,
-} from '../utils/controlsReducer';
+import { initialState, reducer, AppContext } from '../utils/reducer';
 
 export default function App2() {
-  const [controls, dispatchControlsChange] = useReducer(
-    controlsReducer,
-    initialControlsState
-  );
+  const [state, dispatchChange] = useReducer(reducer, initialState);
 
   return (
-    <ControlsContext.Provider value={{ controls, dispatchControlsChange }}>
+    <AppContext.Provider value={{ state, dispatchChange }}>
       <div className="container">
         <div className="inputAndOutputContainer">
           <Input2 />
@@ -32,6 +25,6 @@ export default function App2() {
           }
         `}</style>
       </div>
-    </ControlsContext.Provider>
+    </AppContext.Provider>
   );
 }

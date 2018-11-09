@@ -6,7 +6,7 @@ import React, {
   useLayoutEffect,
 } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
-import { ControlsContext } from '../utils/controlsReducer';
+import { AppContext } from '../utils/reducer';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -53,7 +53,7 @@ function useImage(src) {
 }
 
 export default function ImageInput2() {
-  const { controls, dispatchControlsChange } = useContext(ControlsContext);
+  const { state, dispatchChange } = useContext(AppContext);
   const {
     layerType,
     inputImageIndex,
@@ -62,7 +62,7 @@ export default function ImageInput2() {
     hasBlueChannel,
     convPadding,
     scale,
-  } = controls;
+  } = state;
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
@@ -107,7 +107,7 @@ export default function ImageInput2() {
         a: true,
       });
 
-      dispatchControlsChange({
+      dispatchChange({
         type: 'INPUT_DATA_CHANGE',
         inputData,
         inputWidth,

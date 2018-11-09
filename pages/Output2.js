@@ -1,13 +1,13 @@
 import React, { useLayoutEffect, useContext } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
-import { ControlsContext } from '../utils/controlsReducer';
+import { AppContext } from '../utils/reducer';
 import Dimensions2 from './Dimensions2';
 
 export default function Output2() {
   const [canvasRef, canvasContext] = useCanvas();
-  const { controls } = useContext(ControlsContext);
-  const { outputDataWidth, outputDataHeight, scale, outputData } = controls;
+  const { state } = useContext(AppContext);
+  const { outputDataWidth, outputDataHeight, scale, outputData } = state;
   const outputWidth = outputDataWidth * scale;
   const outputHeight = outputDataHeight * scale;
 

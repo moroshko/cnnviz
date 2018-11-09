@@ -97,7 +97,7 @@ function getLayerSpecificParams(state) {
   }
 }
 
-const initialControlsState = {
+const initialState = {
   inputType: INPUT_TYPES.CAMERA,
   inputImageIndex: 0,
   hasRedChannel: true,
@@ -115,20 +115,20 @@ const initialControlsState = {
   outputData: null,
 };
 
-initialControlsState.convPadding = getConvPadding(initialControlsState);
-initialControlsState.scale = getScale(initialControlsState);
+initialState.convPadding = getConvPadding(initialState);
+initialState.scale = getScale(initialState);
 
 const {
   outputWidth: outputDataWidth,
   outputHeight: outputDataHeight,
 } = getOutputDimensions({
-  inputWidth: INPUT_DISPLAY_WIDTH / initialControlsState.scale,
-  inputHeight: INPUT_DISPLAY_HEIGHT / initialControlsState.scale,
-  ...getLayerSpecificParams(initialControlsState),
+  inputWidth: INPUT_DISPLAY_WIDTH / initialState.scale,
+  inputHeight: INPUT_DISPLAY_HEIGHT / initialState.scale,
+  ...getLayerSpecificParams(initialState),
 });
 
-initialControlsState.outputDataWidth = outputDataWidth;
-initialControlsState.outputDataHeight = outputDataHeight;
+initialState.outputDataWidth = outputDataWidth;
+initialState.outputDataHeight = outputDataHeight;
 
 function getOutputData(state) {
   const {
@@ -179,7 +179,7 @@ function getOutputData(state) {
   }
 }
 
-function controlsReducer(state, action) {
+function reducer(state, action) {
   switch (action.type) {
     case 'INPUT_TYPE_CHANGE': {
       const { inputType } = action;
@@ -486,6 +486,6 @@ function controlsReducer(state, action) {
   }
 }
 
-const ControlsContext = React.createContext(null);
+const AppContext = React.createContext(null);
 
-export { initialControlsState, controlsReducer, ControlsContext };
+export { initialState, reducer, AppContext };

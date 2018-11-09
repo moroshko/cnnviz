@@ -6,11 +6,11 @@ import {
   INPUT_DISPLAY_HEIGHT,
   LAYER_TYPES,
 } from '../utils/constants';
-import { ControlsContext } from '../utils/controlsReducer';
+import { AppContext } from '../utils/reducer';
 
 export default function CameraInput2() {
-  const { controls } = useContext(ControlsContext);
-  const { layerType, convPadding, scale } = controls;
+  const { state } = useContext(AppContext);
+  const { layerType, convPadding, scale } = state;
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);

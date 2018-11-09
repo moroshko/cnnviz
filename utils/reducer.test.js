@@ -1,7 +1,7 @@
 import { INPUT_TYPES, LAYER_TYPES } from './constants';
 import { randomInputData } from './testing';
 import { convolve } from './convolution';
-import { initialControlsState, controlsReducer } from './controlsReducer';
+import { initialState, reducer } from './reducer';
 
 function expectEnum(ENUM_OBJECT) {
   return expect.stringMatching(
@@ -10,7 +10,7 @@ function expectEnum(ENUM_OBJECT) {
 }
 
 it('initial state has the right shape', () => {
-  expect(initialControlsState).toEqual(
+  expect(initialState).toEqual(
     expect.objectContaining({
       inputType: expectEnum(INPUT_TYPES),
       inputImageIndex: expect.any(Number),
@@ -123,7 +123,7 @@ const testInitialState = {
 
 describe('INPUT_TYPE_CHANGE', () => {
   it('updates input type and affected parameters', () => {
-    const newState = controlsReducer(
+    const newState = reducer(
       {
         ...testInitialState,
         inputType: INPUT_TYPES.CAMERA,
@@ -147,7 +147,7 @@ describe('INPUT_TYPE_CHANGE', () => {
 
 describe('INPUT_IMAGE_CHANGE', () => {
   it('updates input image and affected parameters', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'INPUT_IMAGE_CHANGE',
       inputImageIndex: 1,
     });
@@ -165,7 +165,7 @@ describe('INPUT_IMAGE_CHANGE', () => {
 describe('CHANNELS_CHANGE', () => {
   it('updates a single channel', () => {
     expect(
-      controlsReducer(testInitialState, {
+      reducer(testInitialState, {
         type: 'CHANNELS_CHANGE',
         hasRedChannel: false,
       })
@@ -180,7 +180,7 @@ describe('CHANNELS_CHANGE', () => {
 
   it('updates multiple channels', () => {
     expect(
-      controlsReducer(testInitialState, {
+      reducer(testInitialState, {
         type: 'CHANNELS_CHANGE',
         hasGreenChannel: false,
         hasBlueChannel: false,
@@ -197,7 +197,7 @@ describe('CHANNELS_CHANGE', () => {
 
 describe('LAYER_TYPE_CHANGE', () => {
   it('updates layer type and affected parameters', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'LAYER_TYPE_CHANGE',
       layerType: LAYER_TYPES.POOL,
     });
@@ -213,7 +213,7 @@ describe('LAYER_TYPE_CHANGE', () => {
 
 describe('CONV_STRIDE_CHANGE', () => {
   it('updates conv stride and affected parameters', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'CONV_STRIDE_CHANGE',
       convStride: 2,
     });
@@ -230,7 +230,7 @@ describe('CONV_STRIDE_CHANGE', () => {
 
 describe('CONV_FILTER_INDEX_CHANGE', () => {
   it('updates conv filter index and affected parameters', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'CONV_FILTER_INDEX_CHANGE',
       convFilterIndex: 1,
     });
@@ -246,7 +246,7 @@ describe('CONV_FILTER_INDEX_CHANGE', () => {
 
   it('when the stride becomes invalid, updates the stride to the new max possible', () => {
     expect(
-      controlsReducer(
+      reducer(
         {
           ...testInitialState,
           convFilterIndex: 1,
@@ -267,7 +267,7 @@ describe('CONV_FILTER_INDEX_CHANGE', () => {
 
 describe('CONV_FILTER_MATRIX_CHANGE', () => {
   it('does not update the conv filter when the filter is not editable', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'CONV_FILTER_MATRIX_CHANGE',
       convFilterIndex: 0,
       // prettier-ignore
@@ -289,7 +289,7 @@ describe('CONV_FILTER_MATRIX_CHANGE', () => {
   });
 
   it('updates conv filter with errors', () => {
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'CONV_FILTER_MATRIX_CHANGE',
       convFilterIndex: 1,
       // prettier-ignore
@@ -333,7 +333,7 @@ describe('CONV_FILTER_MATRIX_CHANGE', () => {
   });
 
   it('updates conv filter and affected parameters', () => {
-    const newState = controlsReducer(
+    const newState = reducer(
       {
         ...testInitialState,
         convFilterIndex: 1,
@@ -387,7 +387,7 @@ describe('CONV_FILTER_MATRIX_CHANGE', () => {
 
 describe('POOL_FILTER_SIZE_CHANGE', () => {
   it('updates pool filter size and affected parameters', () => {
-    const newState = controlsReducer(
+    const newState = reducer(
       {
         ...testInitialState,
         layerType: LAYER_TYPES.POOL,
@@ -409,7 +409,7 @@ describe('POOL_FILTER_SIZE_CHANGE', () => {
 
 describe('POOL_STRIDE_CHANGE', () => {
   it('updates pool stride and affected parameters', () => {
-    const newState = controlsReducer(
+    const newState = reducer(
       {
         ...testInitialState,
         layerType: LAYER_TYPES.POOL,
@@ -452,7 +452,7 @@ describe('INPUT_DATA_CHANGE', () => {
       outputWidth: outputDataWidth,
       outputHeight: outputDataHeight,
     });
-    const newState = controlsReducer(testInitialState, {
+    const newState = reducer(testInitialState, {
       type: 'INPUT_DATA_CHANGE',
       inputData,
       inputWidth,

@@ -10,11 +10,11 @@ import {
   MAX_SCALE,
   MAX_PADDING,
 } from '../utils/constants';
-import { ControlsContext } from '../utils/controlsReducer';
+import { AppContext } from '../utils/reducer';
 
 export default function Input2() {
-  const { controls } = useContext(ControlsContext);
-  const { inputType, layerType, convPadding, scale } = controls;
+  const { state } = useContext(AppContext);
+  const { inputType, layerType, convPadding, scale } = state;
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
