@@ -1,5 +1,6 @@
-import React, { Fragment, useContext, useRef } from 'react';
+import React, { Fragment, useEffect, useContext, useRef } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
+import { useCamera } from '../hooks/useCamera';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -15,7 +16,18 @@ export default function CameraInput2() {
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
   const [dataCanvasRef /*, dataCanvasContext*/] = useCanvas();
   const [displayCanvasRef /*, displayCanvasContext*/] = useCanvas();
+  const stream = useCamera(displayWidth, displayHeight);
   const videoRef = useRef(null);
+
+  useEffect(
+    () => {
+      if (stream !== null) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    },
+    [stream]
+  );
 
   return (
     <Fragment>
