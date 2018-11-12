@@ -3,7 +3,7 @@ import React, {
   useState,
   useContext,
   useEffect,
-  useLayoutEffect,
+  useMutationEffect,
 } from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { AppContext } from '../utils/reducer';
@@ -72,7 +72,7 @@ export default function ImageInput2() {
   const [dataCanvasRef, dataCanvasContext] = useCanvas();
   const [displayCanvasRef, displayCanvasContext] = useCanvas();
 
-  useLayoutEffect(
+  useMutationEffect(
     () => {
       if (
         image === null ||
@@ -93,14 +93,14 @@ export default function ImageInput2() {
       );
 
       const { width: inputWidth, height: inputHeight } = dataCanvasRef.current;
-      const { data: imageData } = dataCanvasContext.getImageData(
+      const { data } = dataCanvasContext.getImageData(
         0,
         0,
         inputWidth,
         inputHeight
       );
       const inputData = filterChannels({
-        data: imageData,
+        data,
         r: hasRedChannel,
         g: hasGreenChannel,
         b: hasBlueChannel,
