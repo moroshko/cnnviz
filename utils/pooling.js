@@ -17,8 +17,7 @@ function poolStep({
     }
 
     if (
-      ((inputDataIndex - topLeftIndex) >> 2) %
-      inputWidth ===
+      ((inputDataIndex - topLeftIndex) >> 2) % inputWidth ===
       filterSize - 1
     ) {
       inputDataIndex += inputDataIndexNextRowStep;

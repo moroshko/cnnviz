@@ -21,8 +21,7 @@ function convolutionStep({
     sum += inputData[inputDataIndex + channel] * filter[filterIndex++];
 
     if (
-      ((inputDataIndex - topLeftIndex) >> 2) %
-      inputWidth ===
+      ((inputDataIndex - topLeftIndex) >> 2) % inputWidth ===
       filterSize - 1
     ) {
       inputDataIndex += inputDataIndexNextRowStep;
