@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export function useCanvas() {
+export default function useCanvas() {
   const [context, setContext] = useState(null);
   const ref = useRef(null);
 

@@ -1,11 +1,6 @@
-import React, {
-  Fragment,
-  useState,
-  useContext,
-  useEffect,
-  useMutationEffect,
-} from 'react';
-import { useCanvas } from '../hooks/useCanvas';
+import React, { Fragment, useContext, useMutationEffect } from 'react';
+import useCanvas from '../hooks/useCanvas';
+import useImage from '../hooks/useImage';
 import { AppContext } from '../utils/reducer';
 import {
   INPUT_DISPLAY_WIDTH,
@@ -14,43 +9,6 @@ import {
   IMAGES,
 } from '../utils/constants';
 import { filterChannels } from '../utils/shared';
-
-function useImage(src) {
-  const [prevSrc, setPrevSrc] = useState(null);
-  const [{ image, width, height }, setState] = useState({
-    image: null,
-    width: null,
-    height: null,
-  });
-
-  if (src !== prevSrc) {
-    setPrevSrc(src);
-    setState({
-      image: null,
-      width: null,
-      height: null,
-    });
-  }
-
-  useEffect(
-    () => {
-      const image = new Image();
-
-      image.onload = () => {
-        setState({
-          image,
-          width: image.naturalWidth,
-          height: image.naturalHeight,
-        });
-      };
-
-      image.src = src;
-    },
-    [src]
-  );
-
-  return [image, width, height];
-}
 
 export default function ImageInput2() {
   const { state, dispatchChange } = useContext(AppContext);

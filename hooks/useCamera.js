@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useCamera(width, height) {
+export default function useCamera(width, height) {
   const [stream, setStream] = useState(null);
 
   useEffect(() => {

@@ -5,9 +5,9 @@ import React, {
   useContext,
   useRef,
 } from 'react';
-import { useCanvas } from '../hooks/useCanvas';
-import { useCamera } from '../hooks/useCamera';
-import { useRaf } from '../hooks/useRaf';
+import useCanvas from '../hooks/useCanvas';
+import useCamera from '../hooks/useCamera';
+import useRaf from '../hooks/useRaf';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useRaf() {
+export default function useRaf() {
   let [counter, setCounter] = useState(0);
   let rafID;
 

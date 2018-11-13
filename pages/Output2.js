@@ -1,5 +1,5 @@
 import React, { useMutationEffect, useContext } from 'react';
-import { useCanvas } from '../hooks/useCanvas';
+import useCanvas from '../hooks/useCanvas';
 import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { AppContext } from '../utils/reducer';
 import Dimensions2 from './Dimensions2';
