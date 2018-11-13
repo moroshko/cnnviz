@@ -1,6 +1,13 @@
-import React, { Fragment, useEffect, useContext, useRef } from 'react';
+import React, {
+  Fragment,
+  useEffect,
+  useMutationEffect,
+  useContext,
+  useRef,
+} from 'react';
 import { useCanvas } from '../hooks/useCanvas';
 import { useCamera } from '../hooks/useCamera';
+import { useRaf } from '../hooks/useRaf';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -25,10 +32,18 @@ export default function CameraInput2() {
   const [dataCanvasRef, dataCanvasContext] = useCanvas();
   const [displayCanvasRef, displayCanvasContext] = useCanvas();
   const stream = useCamera(displayWidth, displayHeight);
+  const [rafCounter, startRaf] = useRaf();
   const videoRef = useRef(null);
-  const rafRef = useRef();
 
   function draw() {
+    if (
+      videoRef.current === null ||
+      dataCanvasContext === null ||
+      displayCanvasContext === null
+    ) {
+      return;
+    }
+
     const { width: inputWidth, height: inputHeight } = dataCanvasContext.canvas;
 
     /*
@@ -83,8 +98,6 @@ export default function CameraInput2() {
         );
       }
     );
-
-    rafRef.current = requestAnimationFrame(draw);
   }
 
   useEffect(
@@ -92,15 +105,13 @@ export default function CameraInput2() {
       if (stream !== null) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
-        draw();
+        startRaf();
       }
-
-      return () => {
-        cancelAnimationFrame(rafRef.current);
-      };
     },
     [stream]
   );
+
+  useMutationEffect(draw, [rafCounter]);
 
   return (
     <Fragment>
