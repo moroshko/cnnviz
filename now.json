@@ -1,5 +1,9 @@
 {
-  "version": 2,
   "name": "cnnviz",
-  "builds": [{ "src": "next.config.js", "use": "@now/next" }]
+  "version": 2,
+  "builds": [
+    { "src": "next.config.js", "use": "@now/next" },
+    { "src": "static/*", "use": "@now/static" }
+  ],
+  "routes": [{ "src": "^/static/(.*)", "dest": "/static/$1" }]
 }
