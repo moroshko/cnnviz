@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function useRaf() {
-  let [counter, setCounter] = useState(0);
-  let rafID;
+  const [counter, setCounter] = useState(0);
+  const rafID = useRef();
 
   function loop() {
     setCounter(counter => counter + 1);
-    rafID = requestAnimationFrame(loop);
+    rafID.current = requestAnimationFrame(loop);
   }
 
   function start() {
-    rafID = requestAnimationFrame(loop);
+    rafID.current = requestAnimationFrame(loop);
   }
 
   useEffect(() => {
     return () => {
-      cancelAnimationFrame(rafID);
+      cancelAnimationFrame(rafID.current);
     };
   }, []);
 
