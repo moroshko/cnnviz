@@ -1,10 +1,10 @@
 import React, { StrictMode } from 'react';
-import App2 from './App2';
+import App from './App';
 
 export default function Index() {
   return (
     <StrictMode>
-      <App2 />
+      <App />
       <style jsx global>{`
         body {
           margin: 0;

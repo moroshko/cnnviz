@@ -1,15 +1,15 @@
 import React from 'react';
 
 export default function Dimensions(props) {
-  const { width, height, padding } = props;
+  const { title, width, height, padding } = props;
 
   return (
     <div className="container">
-      {width} × {height}
+      <strong>{title}:</strong> {width} × {height}
       {padding > 0 && ` (+ Padding = ${padding})`}
       <style jsx>{`
         .container {
-          font-size: 12px;
+          line-height: 32px;
         }
       `}</style>
     </div>

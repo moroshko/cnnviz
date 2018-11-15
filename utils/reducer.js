@@ -56,17 +56,14 @@ const INITIAL_CONV_FILTERS = [
   errors: convFilter.filter.map(_ => false)
 }));
 
-// TODO: Search for duplicates of this function
 function getConvPadding({ convFilters, convFilterIndex, convStride }) {
   return (convFilters[convFilterIndex].filterSize - convStride) >> 1;
 }
 
-// TODO: Search for duplicates of this function
 function getScale({ inputType, inputImageIndex }) {
   return inputType === INPUT_TYPES.IMAGE ? IMAGES[inputImageIndex].scale : 1;
 }
 
-// TODO: Search for duplicates of this function
 function getLayerSpecificParams(state) {
   const { layerType } = state;
 

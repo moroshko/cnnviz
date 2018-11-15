@@ -1,55 +1,61 @@
-import React from 'react';
-import { MAX_PADDING } from '../utils/constants';
+import React, { useMutationEffect, useContext } from 'react';
+import useCanvas from '../hooks/useCanvas';
+import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
+import { AppContext } from '../utils/reducer';
 import Dimensions from './Dimensions';
 
-export default class Output extends React.Component {
-  displayCanvasRef = canvas => {
-    if (canvas !== null) {
-      this.displayCanvasContext = canvas.getContext('2d', {
-        alpha: false,
-      });
-    }
-  };
+export default function Output2() {
+  const [canvasRef, canvasContext] = useCanvas();
+  const { state } = useContext(AppContext);
+  const { outputDataWidth, outputDataHeight, scale, outputData } = state;
+  const outputWidth = outputDataWidth * scale;
+  const outputHeight = outputDataHeight * scale;
 
-  update(data) {
-    const { dataWidth, dataHeight, scale } = this.props;
-    const imageData = new ImageData(data, dataWidth, dataHeight);
+  useMutationEffect(
+    () => {
+      if (outputData === null) {
+        return;
+      }
 
-    createImageBitmap(imageData).then(imageBitmap => {
-      this.displayCanvasContext.imageSmoothingEnabled = false;
-      this.displayCanvasContext.drawImage(
-        imageBitmap,
-        0,
-        0,
-        dataWidth,
-        dataHeight,
-        0,
-        0,
-        dataWidth * scale,
-        dataHeight * scale
+      const imageData = new ImageData(
+        outputData,
+        outputDataWidth,
+        outputDataHeight
       );
-    });
-  }
 
-  render() {
-    const { dataWidth, dataHeight, scale } = this.props;
+      createImageBitmap(imageData).then(imageBitmap => {
+        canvasContext.imageSmoothingEnabled = false;
+        canvasContext.drawImage(
+          imageBitmap,
+          0,
+          0,
+          outputDataWidth,
+          outputDataHeight,
+          0,
+          0,
+          outputWidth,
+          outputHeight
+        );
+      });
+    },
+    [outputData]
+  );
 
-    return (
-      <div>
-        <canvas
-          width={dataWidth * scale}
-          height={dataHeight * scale}
-          ref={this.displayCanvasRef}
-        />
-        <div className="dimensions">
-          <Dimensions width={dataWidth} height={dataHeight} />
-        </div>
-        <style jsx>{`
-          .dimensions {
-            margin-top: ${MAX_PADDING * scale}px;
-          }
-        `}</style>
-      </div>
-    );
-  }
+  return (
+    <div className="container">
+      <Dimensions
+        title="Output"
+        width={outputDataWidth}
+        height={outputDataHeight}
+      />
+      <canvas width={outputWidth} height={outputHeight} ref={canvasRef} />
+      <style jsx>{`
+        .container {
+          flex-shrink: 0;
+          margin-top: ${MAX_PADDING * MAX_SCALE}px;
+          margin-left: 20px;
+        }
+      `}</style>
+    </div>
+  );
 }

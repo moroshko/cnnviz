@@ -1,92 +1,50 @@
-import React, { Fragment } from 'react';
-import { MAX_PADDING } from '../utils/constants';
+import React, {
+  Fragment,
+  useEffect,
+  useMutationEffect,
+  useContext,
+  useRef,
+} from 'react';
+import useCanvas from '../hooks/useCanvas';
+import useCamera from '../hooks/useCamera';
+import useRaf from '../hooks/useRaf';
+import {
+  INPUT_DISPLAY_WIDTH,
+  INPUT_DISPLAY_HEIGHT,
+  LAYER_TYPES,
+} from '../utils/constants';
+import { AppContext } from '../utils/reducer';
 import { filterChannels } from '../utils/shared';
 
-export default class CameraInput extends React.Component {
-  componentDidMount() {
-    const { displayWidth, displayHeight } = this.props;
+export default function CameraInput2() {
+  const { state, dispatchChange } = useContext(AppContext);
+  const {
+    layerType,
+    hasRedChannel,
+    hasGreenChannel,
+    hasBlueChannel,
+    convPadding,
+    scale,
+  } = state;
+  const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
+  const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
+  const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
+  const [dataCanvasRef, dataCanvasContext] = useCanvas();
+  const [displayCanvasRef, displayCanvasContext] = useCanvas();
+  const stream = useCamera(displayWidth, displayHeight);
+  const [rafCounter, startRaf] = useRaf();
+  const videoRef = useRef(null);
 
-    navigator.mediaDevices
-      .getUserMedia({
-        video: { displayWidth, displayHeight },
-        audio: false,
-      })
-      .then(stream => {
-        this.stream = stream;
-
-        this.video.srcObject = stream;
-        this.video.play();
-
-        this.update();
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      });
-  }
-
-  componentDidUpdate(prevProps) {
-    const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
-
+  function draw() {
     if (
-      hasRedChannel !== prevProps.hasRedChannel ||
-      hasGreenChannel !== prevProps.hasGreenChannel ||
-      hasBlueChannel !== prevProps.hasBlueChannel
+      videoRef.current === null ||
+      dataCanvasContext === null ||
+      displayCanvasContext === null
     ) {
-      this.update();
-    }
-  }
-
-  componentWillUnmount() {
-    cancelAnimationFrame(this.requestID);
-
-    if (this.stream != null) {
-      // stop the camera
-      this.stream.getTracks().forEach(track => track.stop());
-    }
-  }
-
-  getData() {
-    if (!this.dataCanvasContext) {
-      return {
-        inputWidth: null,
-        inputHeight: null,
-        inputData: null,
-      };
-    }
-
-    const { hasRedChannel, hasGreenChannel, hasBlueChannel } = this.props;
-    const {
-      width: inputWidth,
-      height: inputHeight,
-    } = this.dataCanvasContext.canvas;
-    const { data: imageData } = this.dataCanvasContext.getImageData(
-      0,
-      0,
-      inputWidth,
-      inputHeight
-    );
-    const inputData = filterChannels({
-      data: imageData,
-      r: hasRedChannel,
-      g: hasGreenChannel,
-      b: hasBlueChannel,
-      a: true,
-    });
-
-    return {
-      inputWidth,
-      inputHeight,
-      inputData,
-    };
-  }
-
-  update = () => {
-    const { displayWidth, displayHeight, padding, onUpdate } = this.props;
-
-    if (!this.video) {
       return;
     }
+
+    const { width: inputWidth, height: inputHeight } = dataCanvasContext.canvas;
 
     /*
       The transformation matrix is restored to identity matrix whenever canvas
@@ -94,106 +52,93 @@ export default class CameraInput extends React.Component {
       transformation matrix every time before drawing.
       The matrix below performs a horizontal flip.
     */
-    // prettier-ignore
-    this.dataCanvasContext.setTransform(-1, 0, 0, 1, this.dataCanvasContext.canvas.width, 0);
-    this.dataCanvasContext.drawImage(
-      this.video,
+    dataCanvasContext.setTransform(-1, 0, 0, 1, inputWidth, 0);
+    dataCanvasContext.drawImage(
+      videoRef.current,
       padding,
       padding,
-      this.video.width,
-      this.video.height
+      videoRef.current.width,
+      videoRef.current.height
     );
 
-    const { inputData, inputWidth, inputHeight } = this.getData();
-    const imageData = new ImageData(inputData, inputWidth, inputHeight);
-
-    createImageBitmap(imageData).then(imageBitmap => {
-      this.displayCanvasContext.imageSmoothingEnabled = false;
-      this.displayCanvasContext.drawImage(
-        imageBitmap,
-        0,
-        0,
-        inputWidth,
-        inputHeight,
-        0,
-        0,
-        displayWidth,
-        displayHeight
-      );
+    const { data } = dataCanvasContext.getImageData(
+      0,
+      0,
+      inputWidth,
+      inputHeight
+    );
+    const inputData = filterChannels({
+      data,
+      r: hasRedChannel,
+      g: hasGreenChannel,
+      b: hasBlueChannel,
+      a: true,
     });
 
-    onUpdate();
+    dispatchChange({
+      type: 'INPUT_DATA_CHANGE',
+      inputData,
+      inputWidth,
+      inputHeight,
+    });
 
-    this.requestID = requestAnimationFrame(this.update);
-  };
-
-  dataCanvasRef = canvas => {
-    if (canvas !== null) {
-      this.dataCanvasContext = canvas.getContext('2d', {
-        alpha: false,
-      });
-    }
-  };
-
-  displayCanvasRef = canvas => {
-    if (canvas !== null) {
-      this.displayCanvasContext = canvas.getContext('2d', {
-        alpha: false,
-      });
-    }
-  };
-
-  videoRef = video => {
-    if (video != null) {
-      this.video = video;
-    }
-  };
-
-  render() {
-    const { displayWidth, displayHeight, padding, scale } = this.props;
-    const displayCanvasTranslate = (MAX_PADDING - padding) * scale;
-    const containerWhitespace = displayCanvasTranslate << 1;
-
-    return (
-      <Fragment>
-        <div className="container">
-          <canvas
-            className="dataCanvas"
-            width={displayWidth / scale}
-            height={displayHeight / scale}
-            ref={this.dataCanvasRef}
-          />
-          <canvas
-            className="displayCanvas"
-            width={displayWidth}
-            height={displayHeight}
-            ref={this.displayCanvasRef}
-          />
-          <video
-            width={displayWidth - scale * (padding << 1)}
-            height={displayHeight - scale * (padding << 1)}
-            ref={this.videoRef}
-          />
-        </div>
-        <style jsx>{`
-          .container {
-            width: ${displayWidth + containerWhitespace}px;
-            height: ${displayHeight + containerWhitespace}px;
-          }
-          .dataCanvas {
-            display: none;
-          }
-          .displayCanvas {
-            transform: translate(
-              ${displayCanvasTranslate}px,
-              ${displayCanvasTranslate}px
-            );
-          }
-          video {
-            display: none;
-          }
-        `}</style>
-      </Fragment>
+    createImageBitmap(new ImageData(inputData, inputWidth, inputHeight)).then(
+      imageBitmap => {
+        displayCanvasContext.imageSmoothingEnabled = false;
+        displayCanvasContext.drawImage(
+          imageBitmap,
+          0,
+          0,
+          inputWidth,
+          inputHeight,
+          0,
+          0,
+          displayWidth,
+          displayHeight
+        );
+      }
     );
   }
+
+  useEffect(
+    () => {
+      if (stream !== null) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        startRaf();
+      }
+    },
+    [stream]
+  );
+
+  useMutationEffect(draw, [rafCounter]);
+
+  return (
+    <Fragment>
+      <canvas
+        className="dataCanvas"
+        width={displayWidth / scale}
+        height={displayHeight / scale}
+        ref={dataCanvasRef}
+      />
+      <canvas
+        width={displayWidth}
+        height={displayHeight}
+        ref={displayCanvasRef}
+      />
+      <video
+        width={INPUT_DISPLAY_WIDTH}
+        height={INPUT_DISPLAY_HEIGHT}
+        ref={videoRef}
+      />
+      <style jsx>{`
+        .dataCanvas {
+          display: none;
+        }
+        video {
+          display: none;
+        }
+      `}</style>
+    </Fragment>
+  );
 }
