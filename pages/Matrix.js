@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Matrix(props) {
+const Matrix = React.memo(props => {
   const { isEditable, rows, columns, data, errors, onChange } = props;
 
   return (
@@ -85,4 +85,6 @@ export default function Matrix(props) {
       `}</style>
     </div>
   );
-}
+});
+
+export default Matrix;
