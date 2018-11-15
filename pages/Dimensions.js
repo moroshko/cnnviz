@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Dimensions(props) {
+const Dimensions = React.memo(props => {
   const { title, width, height, padding } = props;
 
   return (
@@ -14,4 +14,6 @@ export default function Dimensions(props) {
       `}</style>
     </div>
   );
-}
+});
+
+export default Dimensions;
