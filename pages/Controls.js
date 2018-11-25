@@ -173,10 +173,14 @@ export default function Controls2() {
         </div>
       )}
       {layerType === LAYER_TYPES.CONV && (
-        <div className="filtersContainer">
+        <div>
           Filter:
           {convFilters.map((convFilter, index) => (
-            <div style={{ marginLeft: index > 0 ? 50 : 0 }} key={index}>
+            <div
+              className="filter"
+              style={{ marginLeft: index > 0 ? 50 : 0 }}
+              key={index}
+            >
               <label>
                 <input
                   type="radio"
@@ -216,8 +220,8 @@ export default function Controls2() {
         .inputImagesContainer {
           padding-left: 38px;
         }
-        .filtersContainer {
-          display: flex;
+        .filter {
+          display: inline-block;
         }
       `}</style>
     </div>

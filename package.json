@@ -27,6 +27,7 @@
   "dependencies": {
     "lodash.isequal": "^4.5.0",
     "lodash.memoize": "^4.1.2",
+    "lodash.round": "^4.0.4",
     "next": "^7.0.2",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2"

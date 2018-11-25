@@ -22,7 +22,7 @@ it('initial state has the right shape', () => {
         expect.objectContaining({
           name: expect.any(String),
           isEditable: expect.any(Boolean),
-          filter: expect.arrayContaining([expect.any(Number)]),
+          filter: expect.arrayContaining([expect.any(String)]),
           filterSize: expect.any(Number),
           errors: expect.arrayContaining([expect.any(Boolean)]),
         }),

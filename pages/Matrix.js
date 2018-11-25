@@ -18,18 +18,15 @@ const Matrix = React.memo(props => {
                   <td key={column}>
                     <input
                       className={errors[dataIndex] && 'withError'}
-                      type="number"
-                      step={0.1}
                       disabled={!isEditable}
                       value={data[dataIndex]}
                       onChange={event => {
-                        const value = Number(event.target.value);
                         const newData = data.slice();
 
-                        newData[dataIndex] = isNaN(value) ? '' : value;
+                        newData[dataIndex] = event.target.value;
 
                         const newErrors = newData.map(
-                          value => typeof value !== 'number'
+                          d => d.trim() === '' || isNaN(Number(d))
                         );
 
                         onChange(newData, newErrors);

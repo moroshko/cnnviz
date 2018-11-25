@@ -1,4 +1,5 @@
 import React from 'react';
+import round from 'lodash.round';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -9,46 +10,28 @@ import {
 import { getOutputDimensions } from './shared';
 import { convolve } from './convolution';
 import { pool } from './pooling';
+import { gaussianBlur } from './filters';
 
 // prettier-ignore
 const INITIAL_CONV_FILTERS = [
   {
+    name: 'Gaussian Blur (σ = 1)',
+    isEditable: true,
+    filter: gaussianBlur(5, 1).map(d => String(round(d, 4)))
+  },
+  {
+    name: 'Gaussian Blur (σ = 10)',
+    isEditable: true,
+    filter: gaussianBlur(5, 10).map(d => String(round(d, 4)))
+  },
+  {
     name: 'Edge detection',
-    isEditable: false,
+    isEditable: true,
     filter: [
       0,  1, 0,
       1, -4, 1,
       0,  1, 0
-    ]
-  },
-  {
-    name: 'Blur',
-    isEditable: false,
-    filter: [
-      1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1,
-    ]
-  },
-  {
-    name: 'Sharpen',
-    isEditable: false,
-    filter: [
-       0, -1,  0,
-      -1,  5, -1,
-       0, -1,  0
-    ]
-  },
-  {
-    name: 'Custom (editable)',
-    isEditable: true,
-    filter: [
-       0, 0, 0,
-       0, 1, 0,
-       0, 0, 0
-    ]
+    ].map(d => String(round(d, 4)))
   },
 ].map(convFilter => ({
   ...convFilter,
@@ -95,7 +78,7 @@ function getLayerSpecificParams(state) {
 }
 
 const initialState = {
-  inputType: INPUT_TYPES.CAMERA,
+  inputType: INPUT_TYPES.IMAGE,
   inputImageIndex: 0,
   hasRedChannel: true,
   hasGreenChannel: true,
@@ -150,7 +133,7 @@ function getOutputData(state) {
         inputWidth,
         inputHeight,
         inputData,
-        filter,
+        filter: filter.map(x => Number(x)),
         filterSize,
         stride: convStride,
         outputWidth: outputDataWidth,
@@ -399,6 +382,7 @@ function reducer(state, action) {
         outputDataWidth,
         outputDataHeight,
       };
+
       const outputData = getOutputData(newState);
 
       return {

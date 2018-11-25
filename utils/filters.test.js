@@ -11,4 +11,8 @@ describe('gaussianBlur', () => {
       0.0007889036272159099, 0.006581148067991105, 0.013347324886591145, 0.006581148067991105, 0.0007889036272159099,
     ]);
   });
+
+  it('caches results based on (size, sigma)', () => {
+    expect(gaussianBlur(3, 1)).not.toEqual(gaussianBlur(3, 2));
+  });
 });
