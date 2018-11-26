@@ -132,7 +132,7 @@ export default function Controls2() {
       </div>
       {layerType === LAYER_TYPES.CONV && (
         <div>
-          Stride:
+          Stride = {convStride}
           <input
             type="range"
             min="1"
@@ -140,7 +140,6 @@ export default function Controls2() {
             value={convStride}
             onChange={dispatchNumber('CONV_STRIDE_CHANGE', 'convStride')}
           />
-          {convStride}
         </div>
       )}
       {layerType === LAYER_TYPES.POOL && (
@@ -173,7 +172,7 @@ export default function Controls2() {
         </div>
       )}
       {layerType === LAYER_TYPES.CONV && (
-        <div>
+        <div className="filtersContainer">
           Filter:
           {convFilters.map((convFilter, index) => (
             <div
@@ -194,6 +193,27 @@ export default function Controls2() {
                 />
                 {convFilter.name}
               </label>
+              {Array.isArray(convFilter.knobs) &&
+                convFilter.knobs.map((knob, knobIndex) => (
+                  <div key={knobIndex}>
+                    {knob.leftLabel(knob.value)}
+                    <input
+                      type="range"
+                      min={knob.min}
+                      max={knob.max}
+                      step={knob.step}
+                      value={knob.value}
+                      onChange={event => {
+                        dispatchChange({
+                          type: 'CONV_FILTER_KNOB_CHANGE',
+                          convFilterIndex: index,
+                          knobIndex,
+                          value: Number(event.target.value),
+                        });
+                      }}
+                    />
+                  </div>
+                ))}
               <Matrix
                 isEditable={convFilter.isEditable}
                 rows={convFilter.filterSize}
@@ -220,8 +240,12 @@ export default function Controls2() {
         .inputImagesContainer {
           padding-left: 38px;
         }
+        .filtersContainer {
+          display: flex;
+        }
         .filter {
-          display: inline-block;
+          display: flex;
+          flex-direction: column;
         }
       `}</style>
     </div>

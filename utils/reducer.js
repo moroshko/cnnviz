@@ -12,32 +12,47 @@ import { convolve } from './convolution';
 import { pool } from './pooling';
 import { gaussianBlur } from './filters';
 
-// prettier-ignore
+function roundToString(number) {
+  return String(round(number, 4));
+}
+
 const INITIAL_CONV_FILTERS = [
   {
-    name: 'Gaussian Blur (σ = 1)',
+    name: 'Edge detection',
     isEditable: true,
-    filter: gaussianBlur(5, 1).map(d => String(round(d, 4)))
+    // prettier-ignore
+    filter: [
+      1, 0, -1,
+      2, 0, -2,
+      1, 0, -1
+    ].map(roundToString)
   },
   {
     name: 'Gaussian Blur (σ = 10)',
     isEditable: true,
-    filter: gaussianBlur(5, 10).map(d => String(round(d, 4)))
+    knobs: [
+      {
+        leftLabel: filterSize => `Size = ${filterSize}`,
+        min: 3,
+        max: 9,
+        step: 2,
+        value: 7,
+      },
+    ],
+    filterFn: filterSize => gaussianBlur(filterSize, 10).map(roundToString),
   },
-  {
-    name: 'Edge detection',
-    isEditable: true,
-    filter: [
-      0,  1, 0,
-      1, -4, 1,
-      0,  1, 0
-    ].map(d => String(round(d, 4)))
-  },
-].map(convFilter => ({
-  ...convFilter,
-  filterSize: Math.sqrt(convFilter.filter.length),
-  errors: convFilter.filter.map(_ => false)
-}));
+].map(convFilter => {
+  const filter = convFilter.filterFn
+    ? convFilter.filterFn(...convFilter.knobs.map(knob => knob.value))
+    : convFilter.filter;
+
+  return {
+    ...convFilter,
+    filterSize: Math.sqrt(filter.length),
+    filter,
+    errors: filter.map(_ => false),
+  };
+});
 
 function getConvPadding({ convFilters, convFilterIndex, convStride }) {
   return (convFilters[convFilterIndex].filterSize - convStride) >> 1;
@@ -357,6 +372,63 @@ function reducer(state, action) {
       }
 
       const { convStride, scale } = state;
+      const newConvStride = Math.min(convStride, filterSize);
+      const newConvPadding = getConvPadding({
+        convFilters: newConvFilters,
+        convFilterIndex,
+        convStride: newConvStride,
+      });
+      const {
+        outputWidth: outputDataWidth,
+        outputHeight: outputDataHeight,
+      } = getOutputDimensions({
+        inputWidth: INPUT_DISPLAY_WIDTH / scale,
+        inputHeight: INPUT_DISPLAY_HEIGHT / scale,
+        filterSize,
+        padding: newConvPadding,
+        stride: newConvStride,
+      });
+      const newState = {
+        ...state,
+        convFilters: newConvFilters,
+        convFilterIndex,
+        convStride: newConvStride,
+        convPadding: newConvPadding,
+        outputDataWidth,
+        outputDataHeight,
+      };
+
+      const outputData = getOutputData(newState);
+
+      return {
+        ...newState,
+        outputData,
+      };
+    }
+
+    case 'CONV_FILTER_KNOB_CHANGE': {
+      const { convFilterIndex, knobIndex, value } = action;
+      const { convFilters, convStride, scale } = state;
+      const convFilter = convFilters[convFilterIndex];
+      const { filterFn, knobs } = convFilter;
+      const newKnobs = [...knobs];
+
+      newKnobs[knobIndex] = {
+        ...knobs[knobIndex],
+        value,
+      };
+
+      const filter = filterFn(...newKnobs.map(knob => knob.value));
+      const filterSize = Math.sqrt(filter.length);
+      const newConvFilters = [...convFilters];
+
+      newConvFilters[convFilterIndex] = {
+        ...convFilter,
+        filter,
+        filterSize,
+        knobs: newKnobs,
+      };
+
       const newConvStride = Math.min(convStride, filterSize);
       const newConvPadding = getConvPadding({
         convFilters: newConvFilters,

@@ -6,7 +6,7 @@ const {
 const { getOutputDimensions } = require('../utils/shared');
 const { convolve } = require('../utils/convolution');
 
-const COUNT = 100;
+const COUNT = 50;
 
 function getRandomNumber(min, max) {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -35,7 +35,7 @@ function getRandomInputData() {
 }
 
 const strides = [1, 2, 4];
-const filterSizes = [1, 3, 5, 7];
+const filterSizes = [1, 3, 5, 7, 9, 11, 13, 15];
 const filters = filterSizes.map(getRandomFilter);
 
 strides.forEach(stride => {
@@ -78,18 +78,30 @@ strides.forEach(stride => {
 });
 
 /*
-  const COUNT = 100;
+  const COUNT = 50;
 
-  filterSize = 1, stride = 1 ===> 10.94ms
-  filterSize = 3, stride = 1 ===> 28.57ms
-  filterSize = 5, stride = 1 ===> 64.64ms
-  filterSize = 7, stride = 1 ===> 122.84ms
-  filterSize = 1, stride = 2 ===> 2.94ms
-  filterSize = 3, stride = 2 ===> 7.61ms
-  filterSize = 5, stride = 2 ===> 17.30ms
-  filterSize = 7, stride = 2 ===> 31.40ms
-  filterSize = 1, stride = 4 ===> 0.46ms
-  filterSize = 3, stride = 4 ===> 1.66ms
-  filterSize = 5, stride = 4 ===> 3.88ms
-  filterSize = 7, stride = 4 ===> 7.56ms
+  filterSize = 1, stride = 1 ===> 12.05ms
+  filterSize = 3, stride = 1 ===> 29.04ms
+  filterSize = 5, stride = 1 ===> 65.38ms
+  filterSize = 7, stride = 1 ===> 124.12ms
+  filterSize = 9, stride = 1 ===> 194.15ms
+  filterSize = 11, stride = 1 ===> 280.80ms
+  filterSize = 13, stride = 1 ===> 391.49ms
+  filterSize = 15, stride = 1 ===> 529.55ms
+  filterSize = 1, stride = 2 ===> 3.00ms
+  filterSize = 3, stride = 2 ===> 7.37ms
+  filterSize = 5, stride = 2 ===> 16.56ms
+  filterSize = 7, stride = 2 ===> 31.23ms
+  filterSize = 9, stride = 2 ===> 48.73ms
+  filterSize = 11, stride = 2 ===> 70.50ms
+  filterSize = 13, stride = 2 ===> 97.87ms
+  filterSize = 15, stride = 2 ===> 133.85ms
+  filterSize = 1, stride = 4 ===> 0.51ms
+  filterSize = 3, stride = 4 ===> 1.65ms
+  filterSize = 5, stride = 4 ===> 3.92ms
+  filterSize = 7, stride = 4 ===> 7.70ms
+  filterSize = 9, stride = 4 ===> 11.99ms
+  filterSize = 11, stride = 4 ===> 17.69ms
+  filterSize = 13, stride = 4 ===> 24.66ms
+  filterSize = 15, stride = 4 ===> 33.51ms
 */
