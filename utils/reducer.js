@@ -94,7 +94,7 @@ function getLayerSpecificParams(state) {
 
 const initialState = {
   inputType: INPUT_TYPES.IMAGE,
-  inputImageIndex: 0,
+  inputImageIndex: 1,
   hasRedChannel: true,
   hasGreenChannel: true,
   hasBlueChannel: true,

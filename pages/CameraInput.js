@@ -16,7 +16,7 @@ import {
 import { AppContext } from '../utils/reducer';
 import { filterChannels } from '../utils/shared';
 
-export default function CameraInput2() {
+export default function CameraInput() {
   const { state, dispatchChange } = useContext(AppContext);
   const {
     layerType,

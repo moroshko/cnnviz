@@ -9,7 +9,7 @@ import {
 import { AppContext } from '../utils/reducer';
 import Matrix from './Matrix';
 
-export default function Controls2() {
+export default function Controls() {
   const { state, dispatchChange } = useContext(AppContext);
   const {
     inputType,

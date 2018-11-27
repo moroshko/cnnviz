@@ -12,7 +12,7 @@ import {
 } from '../utils/constants';
 import { AppContext } from '../utils/reducer';
 
-export default function Input2() {
+export default function Input() {
   const { state } = useContext(AppContext);
   const { inputType, layerType, convPadding, scale } = state;
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;

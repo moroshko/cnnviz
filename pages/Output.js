@@ -4,7 +4,7 @@ import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { AppContext } from '../utils/reducer';
 import Dimensions from './Dimensions';
 
-export default function Output2() {
+export default function Output() {
   const [canvasRef, canvasContext] = useCanvas();
   const { state } = useContext(AppContext);
   const { outputDataWidth, outputDataHeight, scale, outputData } = state;

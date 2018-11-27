@@ -10,7 +10,7 @@ import {
 } from '../utils/constants';
 import { filterChannels } from '../utils/shared';
 
-export default function ImageInput2() {
+export default function ImageInput() {
   const { state, dispatchChange } = useContext(AppContext);
   const {
     layerType,

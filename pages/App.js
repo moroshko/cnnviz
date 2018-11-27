@@ -4,7 +4,7 @@ import Output from './Output';
 import Controls from './Controls';
 import { initialState, reducer, AppContext } from '../utils/reducer';
 
-export default function App2() {
+export default function App() {
   const [state, dispatchChange] = useReducer(reducer, initialState);
 
   return (
