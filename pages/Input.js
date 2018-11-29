@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import Dimensions from './Dimensions';
 import ImageInput from './ImageInput';
 import CameraInput from './CameraInput';
+import InputOverlay from './InputOverlay';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -31,6 +32,7 @@ export default function Input() {
       <div className="content">
         {inputType === INPUT_TYPES.IMAGE && <ImageInput />}
         {inputType === INPUT_TYPES.CAMERA && <CameraInput />}
+        {scale === MAX_SCALE && <InputOverlay />}
       </div>
       <style jsx>{`
         .container {
@@ -38,6 +40,7 @@ export default function Input() {
           padding-left: ${containerPadding}px;
         }
         .content {
+          position: relative;
           width: ${displayWidth + containerPadding}px;
           height: ${displayHeight + containerPadding}px;
         }

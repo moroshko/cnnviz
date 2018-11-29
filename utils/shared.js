@@ -1,3 +1,7 @@
+function clamp(num, [min, max]) {
+  return Math.min(max, Math.max(min, num));
+}
+
 function getOutputDimensions({
   inputWidth,
   inputHeight,
@@ -54,6 +58,7 @@ function filterChannels({ data, r, g, b, a }) {
 }
 
 module.exports = {
+  clamp,
   getOutputDimensions,
   mapToPixels,
   filterChannels,

@@ -1,8 +1,23 @@
 const {
+  clamp,
   getOutputDimensions,
   mapToPixels,
   filterChannels,
 } = require('./shared');
+
+describe('clamp', () => {
+  it("doesn't change the number", () => {
+    expect(clamp(3.4, [1, 5])).toBe(3.4);
+  });
+
+  it('clamps to min', () => {
+    expect(clamp(3.4, [4, 5])).toBe(4);
+  });
+
+  it('clamps to max', () => {
+    expect(clamp(3.4, [1, 2])).toBe(2);
+  });
+});
 
 describe('getOutputDimensions', () => {
   it('filterSize = 3, padding = 0, stride = 1', () => {

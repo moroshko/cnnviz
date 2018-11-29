@@ -107,6 +107,8 @@ const initialState = {
   inputData: null,
   inputWidth: null,
   inputHeight: null,
+  overlayGridX: 0,
+  overlayGridY: 0,
   outputData: null,
 };
 
@@ -530,6 +532,16 @@ function reducer(state, action) {
       return {
         ...newState,
         outputData,
+      };
+    }
+
+    case 'OVERLAY_GRID_POSITION_CHANGE': {
+      const { overlayGridX, overlayGridY } = action;
+
+      return {
+        ...state,
+        overlayGridX,
+        overlayGridY,
       };
     }
 

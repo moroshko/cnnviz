@@ -36,6 +36,8 @@ it('initial state has the right shape', () => {
       inputData: null,
       inputWidth: null,
       inputHeight: null,
+      overlayGridX: expect.any(Number),
+      overlayGridY: expect.any(Number),
       outputData: null,
       outputDataWidth: expect.any(Number),
       outputDataHeight: expect.any(Number),
@@ -116,6 +118,8 @@ const testInitialState = {
   inputData: null,
   inputWidth: null,
   inputHeight: null,
+  overlayGridX: 2,
+  overlayGridY: 3,
   outputData: null,
   outputDataWidth: 512,
   outputDataHeight: 384,
@@ -465,5 +469,21 @@ describe('INPUT_DATA_CHANGE', () => {
       inputHeight,
     });
     expect(newState.outputData).toEqual(outputData);
+  });
+});
+
+describe('OVERLAY_GRID_POSITION_CHANGE', () => {
+  it('updates overlay grid x and y', () => {
+    const newState = reducer(testInitialState, {
+      type: 'OVERLAY_GRID_POSITION_CHANGE',
+      overlayGridX: 10,
+      overlayGridY: 20,
+    });
+
+    expect(newState).toMatchObject({
+      overlayGridX: 10,
+      overlayGridY: 20,
+    });
+    expect(newState.outputData).toBe(testInitialState.outputData);
   });
 });
