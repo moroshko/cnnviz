@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { Fragment, useContext, useCallback } from 'react';
 import {
   INPUT_DISPLAY_WIDTH,
   INPUT_DISPLAY_HEIGHT,
@@ -16,6 +16,9 @@ export default function InputOverlay() {
     convPadding,
     poolFilterSize,
     scale,
+    inputData,
+    inputWidth,
+    inputHeight,
     overlayGridX,
     overlayGridY,
   } = state;
@@ -27,8 +30,8 @@ export default function InputOverlay() {
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
-  const maxOverlayGridX = displayWidth / scale - filterSize;
-  const maxOverlayGridY = displayHeight / scale - filterSize;
+  const maxOverlayGridX = inputWidth - filterSize;
+  const maxOverlayGridY = inputHeight - filterSize;
   const onMouseMove = useCallback(
     event => {
       const rect = event.currentTarget.getBoundingClientRect();
@@ -92,13 +95,32 @@ export default function InputOverlay() {
         </pattern>
       </defs>
       {overlayGridX !== null && overlayGridY !== null && (
-        <rect
-          className="grid"
-          x={overlayGridX * scale}
-          y={overlayGridY * scale}
-          width={filterSize * scale}
-          height={filterSize * scale}
-        />
+        <Fragment>
+          <rect
+            className="grid"
+            x={overlayGridX * scale}
+            y={overlayGridY * scale}
+            width={filterSize * scale}
+            height={filterSize * scale}
+          />
+          {inputData !== null &&
+            Array.from({ length: filterSize * filterSize }, (_, i) => {
+              const x = overlayGridX + (i % filterSize);
+              const y = overlayGridY + Math.floor(i / filterSize);
+
+              return (
+                <text
+                  className="text"
+                  x={x * scale + scale / 2}
+                  y={y * scale + scale / 2}
+                  stroke="red"
+                  key={i}
+                >
+                  {inputData[y * (inputWidth << 2) + (x << 2)]}
+                </text>
+              );
+            })}
+        </Fragment>
       )}
       <style jsx>{`
         .container {
@@ -113,6 +135,12 @@ export default function InputOverlay() {
         .gridPatternRect {
           stroke: #1e9e1c;
           fill: none;
+        }
+        .text {
+          font-size: 9px;
+          text-anchor: middle;
+          dominant-baseline: central;
+          cursor: default;
         }
       `}</style>
     </svg>
