@@ -19,8 +19,8 @@ export default function InputOverlay() {
     inputData,
     inputWidth,
     inputHeight,
-    overlayGridX,
-    overlayGridY,
+    inputOverlayGridX,
+    inputOverlayGridY,
   } = state;
   const filterSize =
     layerType === LAYER_TYPES.CONV
@@ -30,41 +30,47 @@ export default function InputOverlay() {
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
-  const maxOverlayGridX = inputWidth - filterSize;
-  const maxOverlayGridY = inputHeight - filterSize;
+  const maxInputOverlayGridX = inputWidth - filterSize;
+  const maxInputOverlayGridY = inputHeight - filterSize;
   const onMouseMove = useCallback(
     event => {
       const rect = event.currentTarget.getBoundingClientRect();
       const x = Math.floor((event.clientX - rect.left) / scale);
       const y = Math.floor((event.clientY - rect.top) / scale);
-      const newOverlayGridX = clamp(x - halfFilterSize, [0, maxOverlayGridX]);
-      const newOverlayGridY = clamp(y - halfFilterSize, [0, maxOverlayGridY]);
+      const newInputOverlayGridX = clamp(x - halfFilterSize, [
+        0,
+        maxInputOverlayGridX,
+      ]);
+      const newInputOverlayGridY = clamp(y - halfFilterSize, [
+        0,
+        maxInputOverlayGridY,
+      ]);
 
       if (
-        newOverlayGridX !== overlayGridX ||
-        newOverlayGridY !== overlayGridY
+        newInputOverlayGridX !== inputOverlayGridX ||
+        newInputOverlayGridY !== inputOverlayGridY
       ) {
         dispatchChange({
           type: 'OVERLAY_GRID_POSITION_CHANGE',
-          overlayGridX: newOverlayGridX,
-          overlayGridY: newOverlayGridY,
+          inputOverlayGridX: newInputOverlayGridX,
+          inputOverlayGridY: newInputOverlayGridY,
         });
       }
     },
     [
       scale,
       halfFilterSize,
-      maxOverlayGridX,
-      maxOverlayGridY,
-      overlayGridX,
-      overlayGridY,
+      maxInputOverlayGridX,
+      maxInputOverlayGridY,
+      inputOverlayGridX,
+      inputOverlayGridY,
     ]
   );
   const onMouseLeave = useCallback(() => {
     dispatchChange({
       type: 'OVERLAY_GRID_POSITION_CHANGE',
-      overlayGridX: null,
-      overlayGridY: null,
+      inputOverlayGridX: null,
+      inputOverlayGridY: null,
     });
   }, []);
 
@@ -94,19 +100,19 @@ export default function InputOverlay() {
           />
         </pattern>
       </defs>
-      {overlayGridX !== null && overlayGridY !== null && (
+      {inputOverlayGridX !== null && inputOverlayGridY !== null && (
         <Fragment>
           <rect
             className="grid"
-            x={overlayGridX * scale}
-            y={overlayGridY * scale}
+            x={inputOverlayGridX * scale}
+            y={inputOverlayGridY * scale}
             width={filterSize * scale}
             height={filterSize * scale}
           />
           {inputData !== null &&
             Array.from({ length: filterSize * filterSize }, (_, i) => {
-              const x = overlayGridX + (i % filterSize);
-              const y = overlayGridY + Math.floor(i / filterSize);
+              const x = inputOverlayGridX + (i % filterSize);
+              const y = inputOverlayGridY + Math.floor(i / filterSize);
 
               return (
                 <text
