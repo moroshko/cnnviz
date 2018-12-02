@@ -4,7 +4,7 @@ import {
   INPUT_DISPLAY_HEIGHT,
   LAYER_TYPES,
 } from '../utils/constants';
-import { clamp } from '../utils/shared';
+import { getGridPosition } from '../utils/overlay';
 import { AppContext } from '../utils/reducer';
 
 export default function InputOverlay() {
@@ -14,7 +14,9 @@ export default function InputOverlay() {
     convFilters,
     convFilterIndex,
     convPadding,
+    convStride,
     poolFilterSize,
+    poolStride,
     scale,
     inputData,
     inputWidth,
@@ -26,25 +28,26 @@ export default function InputOverlay() {
     layerType === LAYER_TYPES.CONV
       ? convFilters[convFilterIndex].filterSize
       : poolFilterSize;
-  const halfFilterSize = filterSize >> 1;
+  const stride = layerType === LAYER_TYPES.CONV ? convStride : poolStride;
   const padding = layerType === LAYER_TYPES.CONV ? convPadding : 0;
   const displayWidth = INPUT_DISPLAY_WIDTH + scale * (padding << 1);
   const displayHeight = INPUT_DISPLAY_HEIGHT + scale * (padding << 1);
-  const maxInputOverlayGridX = inputWidth - filterSize;
-  const maxInputOverlayGridY = inputHeight - filterSize;
   const onMouseMove = useCallback(
     event => {
       const rect = event.currentTarget.getBoundingClientRect();
-      const x = Math.floor((event.clientX - rect.left) / scale);
-      const y = Math.floor((event.clientY - rect.top) / scale);
-      const newInputOverlayGridX = clamp(x - halfFilterSize, [
-        0,
-        maxInputOverlayGridX,
-      ]);
-      const newInputOverlayGridY = clamp(y - halfFilterSize, [
-        0,
-        maxInputOverlayGridY,
-      ]);
+      const inputX = Math.floor((event.clientX - rect.left) / scale);
+      const inputY = Math.floor((event.clientY - rect.top) / scale);
+      const {
+        inputOverlayGridX: newInputOverlayGridX,
+        inputOverlayGridY: newInputOverlayGridY,
+      } = getGridPosition({
+        inputWidth,
+        inputHeight,
+        filterSize,
+        stride,
+        inputX,
+        inputY,
+      });
 
       if (
         newInputOverlayGridX !== inputOverlayGridX ||
@@ -59,9 +62,10 @@ export default function InputOverlay() {
     },
     [
       scale,
-      halfFilterSize,
-      maxInputOverlayGridX,
-      maxInputOverlayGridY,
+      inputWidth,
+      inputHeight,
+      filterSize,
+      stride,
       inputOverlayGridX,
       inputOverlayGridY,
     ]
