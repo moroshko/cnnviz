@@ -25,8 +25,6 @@ function getGridPosition({
   return {
     inputOverlayGridX,
     inputOverlayGridY,
-    outputOverlayGridX,
-    outputOverlayGridY,
   };
 }
 

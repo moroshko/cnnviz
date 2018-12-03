@@ -16,8 +16,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -34,8 +32,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 12,
           inputOverlayGridY: 7,
-          outputOverlayGridX: 12,
-          outputOverlayGridY: 7,
         });
       });
 
@@ -52,8 +48,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 8,
           inputOverlayGridY: 4,
-          outputOverlayGridX: 8,
-          outputOverlayGridY: 4,
         });
       });
     });
@@ -74,8 +68,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -92,8 +84,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 10,
           inputOverlayGridY: 5,
-          outputOverlayGridX: 10,
-          outputOverlayGridY: 5,
         });
       });
 
@@ -110,8 +100,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 7,
           inputOverlayGridY: 3,
-          outputOverlayGridX: 7,
-          outputOverlayGridY: 3,
         });
       });
     });
@@ -130,8 +118,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -148,8 +134,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 10,
           inputOverlayGridY: 4,
-          outputOverlayGridX: 5,
-          outputOverlayGridY: 2,
         });
       });
 
@@ -166,8 +150,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 6,
           inputOverlayGridY: 2,
-          outputOverlayGridX: 3,
-          outputOverlayGridY: 1,
         });
       });
     });
@@ -186,8 +168,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -204,8 +184,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 9,
           inputOverlayGridY: 3,
-          outputOverlayGridX: 3,
-          outputOverlayGridY: 1,
         });
       });
 
@@ -222,8 +200,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 6,
           inputOverlayGridY: 3,
-          outputOverlayGridX: 2,
-          outputOverlayGridY: 1,
         });
       });
     });
@@ -244,8 +220,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -262,8 +236,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 8,
           inputOverlayGridY: 3,
-          outputOverlayGridX: 8,
-          outputOverlayGridY: 3,
         });
       });
 
@@ -280,8 +252,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 6,
           inputOverlayGridY: 2,
-          outputOverlayGridX: 6,
-          outputOverlayGridY: 2,
         });
       });
     });
@@ -300,8 +270,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -318,8 +286,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 8,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 2,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -336,8 +302,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 4,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 1,
-          outputOverlayGridY: 0,
         });
       });
     });
@@ -358,8 +322,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 0,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 0,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -376,8 +338,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 6,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 3,
-          outputOverlayGridY: 0,
         });
       });
 
@@ -394,8 +354,6 @@ describe('getGridPosition', () => {
         ).toMatchObject({
           inputOverlayGridX: 4,
           inputOverlayGridY: 0,
-          outputOverlayGridX: 2,
-          outputOverlayGridY: 0,
         });
       });
     });

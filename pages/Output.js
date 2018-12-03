@@ -3,6 +3,7 @@ import useCanvas from '../hooks/useCanvas';
 import { MAX_SCALE, MAX_PADDING } from '../utils/constants';
 import { AppContext } from '../utils/reducer';
 import Dimensions from './Dimensions';
+import OutputOverlay from './OutputOverlay';
 
 export default function Output() {
   const [canvasRef, canvasContext] = useCanvas();
@@ -48,12 +49,18 @@ export default function Output() {
         width={outputDataWidth}
         height={outputDataHeight}
       />
-      <canvas width={outputWidth} height={outputHeight} ref={canvasRef} />
+      <div className="content">
+        <canvas width={outputWidth} height={outputHeight} ref={canvasRef} />
+        {scale === MAX_SCALE && <OutputOverlay />}
+      </div>
       <style jsx>{`
         .container {
           flex-shrink: 0;
           margin-top: ${MAX_PADDING * MAX_SCALE}px;
           margin-left: 20px;
+        }
+        .content {
+          position: relative;
         }
       `}</style>
     </div>
